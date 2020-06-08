@@ -64,11 +64,22 @@ export class Bot {
     // First let's filter all the messages we don't want
     // We don't want bots & we don't want blank messages (ie images with no
     // caption)
-    if (message.author.bot || message.content.length == 0)
+    if (message.author.bot || message.content.length == 0 || !message.member)
       return;
 
     // Next let's see if they're communicating with our bot
     if (message.content.startsWith(this.prefix)) {
+      // Make sure they have the valid roles to talk to the bot / join the
+      // MC server.
+      const isValid = this.isValidMember(message.member);
+      if (!isValid) {
+        await message.reply(
+          "You don't have the required roles to run this bot."
+        );
+        return
+      }
+
+
       // args = ["<bot prefix>", "<command name>" || undefined]
       const args = message.content.split(' ');
 
@@ -115,13 +126,6 @@ export class Bot {
     // Make sure this command is being executed in a Discord server
     if (!msg.member)
       return;
-
-    // Let's make sure they're a tier 3 member
-    const isTierThree = this.isTierThree(msg.member);
-
-    if (!isTierThree)
-      return;
-
 
     // This means they didn't provide a player name in the message:
     // args = ["<bot prefix>", "link", "<mc player name>" || undefined]
@@ -221,7 +225,7 @@ export class Bot {
    * @returns {Promise<boolean>}
    * @throws {Error} if it can't get the guild that the bot is serving.
    */
-  public async isTierThree(resolvable: GuildMember | string): Promise<boolean> {
+  public async isValidMember(resolvable: GuildMember | string): Promise<boolean> {
     let member: GuildMember | null;
 
     if (typeof resolvable == 'string') {
@@ -235,7 +239,7 @@ export class Bot {
 
     for (const roleID of member.roles.cache.keys()) {
       let isWhitelisted = this.whitelist.includes(roleID);
-      
+
       if (isWhitelisted) {
         return true;
       }

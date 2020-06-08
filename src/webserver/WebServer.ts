@@ -158,7 +158,7 @@ export class WebServer {
 
     try {
       const discordID = this.db.getDiscordID(playerUUID);
-      const isTierThree = await this.discord.isTierThree(discordID);
+      const isTierThree = await this.discord.isValidMember(discordID);
 
       res.status(200);
       if (isTierThree) {

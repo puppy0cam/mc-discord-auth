@@ -6,9 +6,9 @@ which then checks the database if it's "linked" with a Discord account, if
 it is then it responds true else it responds false.
 
 ## [Discord Bot](./src/discord/Bot.ts)
-The Discord bot has two public methods start and isTierThree. The start
+The Discord bot has two public methods start and isValidMember. The start
 method must be called above anything else. Once it is the WebServer can call 
-"isTierThree" to authenticate that a certain user is ready to play on the
+"isValidMember" to authenticate that a certain user is ready to play on the
 Minecraft server. All other uncovered methods are heavily commented just
 review the Bot.ts file in src/discord.
 
