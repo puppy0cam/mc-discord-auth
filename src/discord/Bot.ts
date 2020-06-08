@@ -20,14 +20,14 @@ export class Bot {
   private readonly guild: string;
   private readonly db: DBController;
   private readonly prefix: string;
-  private readonly reqRole: string;
+  private readonly whitelist: string[];
   private readonly token: string;
 
 
   constructor(db: DBController, config: DiscordConfig) {
     this.client = new Client();
     this.guild = config.guild_id;
-    this.reqRole = config.role_id;
+    this.whitelist = config.roles;
     this.db = db;
     this.prefix = config.prefix;
     this.token = config.token;
@@ -233,7 +233,14 @@ export class Bot {
     if (member == null)
       return false;
 
-    return member.roles.cache.has(this.reqRole);
+    for (const roleID of member.roles.cache.keys()) {
+      let isWhitelisted = this.whitelist.includes(roleID);
+
+      if (isWhitelisted) {
+        return true;
+      }
+    }
+    return false;
   }
 }
 

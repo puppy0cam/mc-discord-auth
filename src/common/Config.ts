@@ -17,7 +17,7 @@ export type DBConfig = {
 export type DiscordConfig = {
   guild_id: string;
   prefix: string;
-  role_id: string;
+  roles: string[];
   token: string;
 }
 
@@ -46,7 +46,7 @@ export class Config {
     this.discord = {
       token: '',
       prefix: '!minecraft',
-      role_id: '',
+      roles: ['role id 1', 'role id 2', 'role id 3'],
       guild_id: '',
     };
     this.webserver = {
