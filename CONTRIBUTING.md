@@ -13,75 +13,10 @@ Minecraft server. All other uncovered methods are heavily commented just
 review the Bot.ts file in src/discord.
 
 ## [WebServer](./src/webserver/WebServer.ts)
-The WebServer has one endpoint which is "isValidPlayer" it intakes a POST
-request with the following body. 
+The WebServer interfaces with a Minecraft server to validate each player
+that joins the game. Administrators of the Minecraft server can also add
+"alt" accounts which will enforce a player's acceptance when they join the
+game.
 
-### Request Body
-| Attribute | Type   | Description             |
-|-----------|--------|-------------------------|
-| player_id | string | The Minecraft player ID |
-
-The player_id is the Minecraft player UUID stripped of all the dashes. The
-server will provide the following response if everything went alright
-, otherwise an error may occur. Make sure that all provided headers are given:
-
-Required Headers:
- 1. Content-Type: `application/json`
- 2. Authorization: `Bearer <webserver token>` 
-
-### [Response Body](./src/webserver/responses.ts)
-| Attribute | Type    | Description                                      |
-|-----------|---------|--------------------------------------------------|
-| valid     | boolean | Whether or not the given player is ready to play |
-| reason    | string  | The reason will be be 'no_link' or 'no_role'     |
-
-
-The valid attribute is a boolean which represents whether the player can
-play on the Minecraft server. This will always return a boolean whether or
-not there was an issue getting the member associated with the provided
-player ID.
-
-An added "reason" attribute also exists. It will only be 'no_link' which
- means the Minecraft player isn't linked with a Discord account and
-  'no_role' which means they're not whitelisted 
-
-### [Errors](./src/webserver/errors.ts)
-
-#### NoBodyError
-```json
-{
-  "errcode": "NO_BODY",
-  "message": "There wasn't a body in this request"
-}
-```
-
-This occurs when a body is not provided.
-
-### NoPlayerID
-```json
-{
-  "errcode": "NO_PLAYER_ID",
-  "message": "There wasn't a player ID provided"
-}
-```
-
-NO_PLAYER_ID occurrs when the "player_id" attribute is not provided.
-
-### PlayerIDType
-```json
-{
-  "errcode": "PLAYER_ID_TYPE",
-  "message": "The provided player ID wasn't a string"
-}
-```
-PLAYER_ID_TYPE occurs when the "player_id" attribute isn't a string
-
-### internalError
-```json
-{
-  "errcode": "INTERNAL_ERROR",
-  "message": "An internal error occurred"
-}
-```
-
-This isn't used, but it's reserved when something has gone terribly wrong.
+## WebServer Endpoints
+See [Endpoints.md](./docs/Endpoints.md)

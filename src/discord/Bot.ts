@@ -144,7 +144,7 @@ export class Bot {
       const uuid = await mc.getUUID(playerName);
 
       if (uuid) {
-        this.db.link(msg.author.id, uuid);
+        this.db.links.link(msg.author.id, uuid);
         await msg.reply("Linked.");
       } else {
         await msg.reply(`Failed to get UUID of "${playerName}"`)
@@ -180,7 +180,7 @@ export class Bot {
    * @param {Message} msg Message to respond to
    */
   private async unlink(msg: Message) {
-    const unlinked = this.db.unlink(msg.author.id);
+    const unlinked = this.db.links.unlink(msg.author.id);
 
     if (unlinked)
       await msg.reply("You've been unlinked.");
@@ -190,7 +190,7 @@ export class Bot {
 
   private async whoami(msg: Message) {
     try {
-      const uuid = this.db.getMcID(msg.author.id);
+      const uuid = this.db.links.getMcID(msg.author.id);
       const name = await mc.getName(uuid);
 
       await msg.reply(`You're linked as "${name}"`);

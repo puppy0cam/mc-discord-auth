@@ -9,9 +9,9 @@ import express, { Express, NextFunction, Request, Response } from 'express';
 import { v4 as uuid } from 'uuid';
 import { WebServerConfig } from "../common/Config";
 import { Bot } from "../discord/Bot";
-import { noBodyError, noPlayerID, playerIDType } from "./errors";
-import { DBController, NoDiscordAccError } from "../db";
-import { isNotValid, isValid } from "./responses";
+import { DBController } from "../db";
+import { isValidPlayer } from "./routes/isValidPlayer/isValidPlayer";
+import { altsRoute } from "./routes/alts/alts";
 
 
 /**
@@ -20,9 +20,9 @@ import { isNotValid, isValid } from "./responses";
  * each request and finally gets the results with the isValidPlayer method.
  */
 export class WebServer {
+  public readonly db: DBController;
+  public readonly discord: Bot;
   private readonly app: Express;
-  private readonly db: DBController;
-  private readonly discord: Bot;
   private readonly port: number;
   private readonly token: string;
 
@@ -43,14 +43,19 @@ export class WebServer {
     // Authorize every request
     this.app.use('/', this.checkAuth.bind(this));
 
+    // GET, POST, DELETE /alts
+
     // Parse incoming bodies
-    this.app.post('/isValidPlayer', express.json());
+    this.app.use('/', express.json())
 
-    // Validate incoming bodies
-    this.app.post('/isValidPlayer', WebServer.validateBody.bind(this));
+    this.app.use('/', altsRoute);
 
-    // Listen to the /isValidPlayer POST endpoint
-    this.app.post('/isValidPlayer', this.isValidPlayer.bind(this));
+    // POST /isValidPlayer
+
+    // Parse incoming bodies
+    this.app.use('/', express.json());
+
+    this.app.use('/', isValidPlayer);
   }
 
   /**
@@ -90,107 +95,13 @@ export class WebServer {
     const token = authSplit[1];
 
     if (token == this.token) {
+      // @ts-ignore
+      req['webserver'] = this;
       next();
     } else {
       res.status(401);
       res.end();
       return;
-    }
-  }
-
-  /**
-   * This makes sure that the authorized client is providing a valid body
-   * @param req
-   * @param res
-   * @param next
-   */
-  private static validateBody(req: Request, res: Response, next: NextFunction) {
-    // @ts-ignore
-    const reqID = req['id'];
-
-    console.log(
-      `Validating Body for Request "${reqID}"`
-    );
-
-    if (req.body == undefined) {
-      res.status(400);
-      res.send(noBodyError);
-      res.end();
-    }
-
-    const playerUUID = req.body['player_id'];
-
-    res.setHeader('Content-Type', 'application/json');
-
-    if (playerUUID == undefined) {
-      res.status(400);
-      res.send(noPlayerID);
-      console.log(`Response for "${reqID}"\n`, noPlayerID);
-      res.end();
-      return;
-    } else if (typeof playerUUID != 'string') {
-      res.status(400);
-      res.send(playerIDType);
-      console.log(`Response for "${reqID}"\n`, playerIDType);
-      res.end();
-      return;
-    }
-
-    // @ts-ignore
-    req['player_id'] = playerUUID;
-    console.log(
-      `Validated Request `
-    )
-    next();
-  }
-
-  /**
-   * This tells the Minecraft server is a provided player is authenticated
-   * on the Discord server.
-   * @param req
-   * @param res
-   */
-  private async isValidPlayer(req: Request, res: Response) {
-    // @ts-ignore
-    const reqID = req['id'];
-    // @ts-ignore
-    const playerUUID = req['player_id'];
-
-    try {
-      const discordID = this.db.getDiscordID(playerUUID);
-      const isTierThree = await this.discord.isValidMember(discordID);
-
-      res.status(200);
-      if (isTierThree) {
-        res.send(isValid);
-        console.log(`Response for "${reqID}"\n`, isValid);
-        res.end();
-      } else {
-        const body: isNotValid = {
-          valid: false,
-          reason: "no_role"
-        };
-        console.log(`Response for "${reqID}"\n`, body);
-        res.send(body);
-      }
-      res.status(200);
-      res.end();
-
-    } catch (err) {
-      let body: isNotValid = {
-        valid: false,
-        reason: 'no_link'
-      };
-      console.log(`Response for "${reqID}"\n`, body);
-      if (err instanceof NoDiscordAccError) {
-        res.status(200);
-        res.send(body);
-        res.end()
-      } else {
-        res.status(200);
-        res.send(body);
-        res.end();
-      }
     }
   }
 }
