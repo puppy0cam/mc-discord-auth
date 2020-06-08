@@ -125,13 +125,13 @@ export class WebServer {
     if (playerUUID == undefined) {
       res.status(400);
       res.send(noPlayerID);
-      console.log(`Response for "${reqID}"\n` + noPlayerID);
+      console.log(`Response for "${reqID}"\n`, noPlayerID);
       res.end();
       return;
     } else if (typeof playerUUID != 'string') {
       res.status(400);
       res.send(playerIDType);
-      console.log(`Response for "${reqID}"\n` + playerIDType);
+      console.log(`Response for "${reqID}"\n`, playerIDType);
       res.end();
       return;
     }
@@ -163,14 +163,14 @@ export class WebServer {
       res.status(200);
       if (isTierThree) {
         res.send(isValid);
-        console.log(`Response for "${reqID}"\n` + isValid);
+        console.log(`Response for "${reqID}"\n`, isValid);
         res.end();
       } else {
         const body: isNotValid = {
           valid: false,
           reason: "no_role"
         };
-        console.log(`Response for "${reqID}"\n` + body);
+        console.log(`Response for "${reqID}"\n`, body);
         res.send(body);
       }
       res.status(200);
@@ -181,7 +181,7 @@ export class WebServer {
         valid: false,
         reason: 'no_link'
       };
-      console.log(`Response for "${reqID}"\n` + body);
+      console.log(`Response for "${reqID}"\n`, body);
       if (err instanceof NoDiscordAccError) {
         res.status(200);
         res.send(body);
