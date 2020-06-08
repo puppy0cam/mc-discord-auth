@@ -33,11 +33,17 @@ Required Headers:
 | Attribute | Type    | Description                                      |
 |-----------|---------|--------------------------------------------------|
 | valid     | boolean | Whether or not the given player is ready to play |
+| reason    | string  | The reason will be be 'no_link' or 'no_role'     |
+
 
 The valid attribute is a boolean which represents whether the player can
 play on the Minecraft server. This will always return a boolean whether or
 not there was an issue getting the member associated with the provided
 player ID.
+
+An added "reason" attribute also exists. It will only be 'no_link' which
+ means the Minecraft player isn't linked with a Discord account and
+  'no_role' which means they're not whitelisted 
 
 ### [Errors](./src/webserver/errors.ts)
 

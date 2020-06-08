@@ -136,17 +136,31 @@ export class WebServer {
       const isTierThree = await this.discord.isTierThree(discordID);
 
       res.status(200);
-      isTierThree ? res.send(isValid) : res.send(isNotValid);
+      if (isTierThree) {
+        res.send(isValid);
+        res.end();
+      } else {
+        const body: isNotValid = {
+          valid: false,
+          reason: "no_role"
+        };
+        res.send(body);
+      }
+      res.status(200);
       res.end();
 
     } catch (err) {
+      let body: isNotValid = {
+        valid: false,
+        reason: 'no_link'
+      };
       if (err instanceof NoDiscordAccError) {
         res.status(200);
-        res.send(isNotValid);
+        res.send(body);
         res.end()
       } else {
         res.status(500);
-        res.send(isNotValid);
+        res.send(body);
         res.end();
       }
     }

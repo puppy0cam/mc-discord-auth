@@ -2,6 +2,9 @@ export const isValid = {
   "valid": true
 }
 
-export const isNotValid = {
-  "valid": false
+export type isNotValid = {
+  valid: false,
+  reason: notValidReason;
 }
+
+export type notValidReason = 'no_link' | 'no_role';
