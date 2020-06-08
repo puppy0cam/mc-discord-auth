@@ -1,3 +1,8 @@
+/**
+ * Database controller class
+ * @license GNU GPLv3
+ * @author Dylan Hackworth <dhpf@pm.me>
+ */
 import sql from 'better-sqlite3';
 import mkdirp from 'mkdirp';
 import fs from 'fs';
@@ -6,7 +11,11 @@ import { NoMcAccError, AlreadyLinkedError, NoDiscordAccError } from './errors';
 import { DBConfig } from "../common/Config";
 
 
-
+/**
+ * This class controls the SQLite3 database currently it only manages one
+ * table which is "account_links" it makes sure that links don't already
+ * exist when creating a new one and also keeping them valid.
+ */
 export class DBController {
   public static readonly rootDir = `${process.cwd()}/config`;
   public static readonly defPath = `${DBController.rootDir}/accounts.db`;

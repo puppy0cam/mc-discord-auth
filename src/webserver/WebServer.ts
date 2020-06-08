@@ -1,3 +1,10 @@
+/**
+ * This module interfaces with Minecraft servers, servers can call the
+ * "isPlayerValid" POST endpoint to see if a certain player (provided with
+ * a UUID) is valid
+ * @license GNU GPLv3
+ * @author Dylan Hackworth <dhpf@pm.me>
+ */
 import express, { Express, NextFunction, Request, Response } from 'express';
 import { WebServerConfig } from "../common/Config";
 import { Bot } from "../discord/Bot";
@@ -6,6 +13,11 @@ import { DBController, NoDiscordAccError } from "../db";
 import { isNotValid, isValid } from "./responses";
 
 
+/**
+ * This is the WebServer it first authenticates each request that comes in
+ * with the checkAuth object method. Then it validates all the bodies of
+ * each request and finally gets the results with the isValidPlayer method.
+ */
 export class WebServer {
   private readonly app: Express;
   private readonly db: DBController;
@@ -25,6 +37,8 @@ export class WebServer {
   public start() {
     this.app.listen(this.port);
 
+    console.log("WebServer: Listening on port " + this.port);
+
     // Authorize every request
     this.app.use('/', this.checkAuth.bind(this));
 
@@ -38,6 +52,13 @@ export class WebServer {
     this.app.post('/isValidPlayer', this.isValidPlayer.bind(this));
   }
 
+  /**
+   * This makes sure that the client communicating with this webserver is
+   * authorized to do so.
+   * @param req
+   * @param res
+   * @param next
+   */
   private checkAuth(req: Request, res: Response, next: NextFunction) {
     const auth = req.header('Authorization');
 
@@ -66,6 +87,12 @@ export class WebServer {
     }
   }
 
+  /**
+   * This makes sure that the authorized client is providing a valid body
+   * @param req
+   * @param res
+   * @param next
+   */
   private static validateBody(req: Request, res: Response, next: NextFunction) {
     if (req.body == undefined) {
       res.status(400);
@@ -94,6 +121,12 @@ export class WebServer {
     next();
   }
 
+  /**
+   * This tells the Minecraft server is a provided player is authenticated
+   * on the Discord server.
+   * @param req
+   * @param res
+   */
   private async isValidPlayer(req: Request, res: Response) {
     // @ts-ignore
     const playerUUID = req['player_id'];

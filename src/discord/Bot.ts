@@ -16,17 +16,18 @@ import { DiscordConfig } from "../common/Config";
  * it call the start() method of a Bot object.
  */
 export class Bot {
-  private static readonly tierThreeRole = "719434318933393421";
-  private static readonly guild = "719409237868019734";
-
   private readonly client: Client;
+  private readonly guild: string;
   private readonly db: DBController;
   private readonly prefix: string;
+  private readonly reqRole: string;
   private readonly token: string;
 
 
   constructor(db: DBController, config: DiscordConfig) {
     this.client = new Client();
+    this.guild = config.guild_id;
+    this.reqRole = config.role_id;
     this.db = db;
     this.prefix = config.prefix;
     this.token = config.token;
@@ -42,6 +43,11 @@ export class Bot {
     // bot can see, if the bot isn't in the channel then no messages are
     // emitted here.
     this.client.on('message', this.onMessage.bind(this));
+
+    this.client.on('ready', () => {
+      if (this.client.user)
+        console.log("Bot: Ready as " + this.client.user.username)
+    })
 
     // Finally login into the Discord API gateway to start receiving and
     // sending objects through the websocket.
@@ -133,9 +139,11 @@ export class Bot {
     try {
       const uuid = await mc.getUUID(playerName);
 
-      if (!uuid) {
+      if (uuid) {
         this.db.link(msg.author.id, uuid);
         await msg.reply("Linked.");
+      } else {
+        await msg.reply(`Failed to get UUID of "${playerName}"`)
       }
 
     } catch (err) {
@@ -199,7 +207,7 @@ export class Bot {
    * serving.
    */
   private resolveMember(id: string): GuildMember | null {
-    const guild = this.client.guilds.cache.get(Bot.guild);
+    const guild = this.client.guilds.cache.get(this.guild);
 
     if (guild)
       return guild.member(id);
@@ -225,7 +233,7 @@ export class Bot {
     if (member == null)
       return false;
 
-    const role = await member.roles.resolveID(Bot.tierThreeRole);
+    const role = await member.roles.cache.has(this.reqRole);
 
     return role != null;
   }

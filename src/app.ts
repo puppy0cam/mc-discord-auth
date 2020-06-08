@@ -1,13 +1,25 @@
+/**
+ * @license GNU GPLv3
+ * @author Dylan Hackworth <dhpf@pm.me>
+ */
 import { Bot } from "./discord/Bot";
 import { DBController } from "./db";
 import { WebServer } from "./webserver/WebServer";
 import { Config } from "./common/Config";
 
 
+/**
+ * This initializes the config.yaml file
+ * @param {string | undefined} location Optional config location
+ */
 function init(location?: string) {
   Config.genConfig(location);
 }
 
+/**
+ * This starts mc-discord-auth
+ * @param {string | undefined} location Optional config location
+ */
 async function start(location?: string) {
   const config = Config.getConfig(location);
 

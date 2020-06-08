@@ -1,11 +1,12 @@
 {
   "name": "mc-discord-auth",
-  "version": "0.9.0",
+  "version": "1.0.0",
   "main": "index.js",
   "license": "GPL-3.0",
   "scripts": {
     "setup": "tsc && node ./dist/app.js --INIT",
-    "start": "node ./dist/app.js"
+    "start": "node ./dist/app.js",
+    "test": "tsc && npm run start"
   },
   "devDependencies": {
     "@types/bent": "^7.0.2",

@@ -1,3 +1,8 @@
+/**
+ * config.yaml Config handler class
+ * @license GNU GPLv3
+ * @author Dylan Hackworth <dhpf@pm.me>
+ */
 import fs from 'fs';
 import yaml from 'yaml';
 import mkdirp from 'mkdirp';
@@ -10,8 +15,10 @@ export type DBConfig = {
 }
 
 export type DiscordConfig = {
-  token: string;
+  guild_id: string;
   prefix: string;
+  role_id: string;
+  token: string;
 }
 
 export type WebServerConfig = {
@@ -19,6 +26,11 @@ export type WebServerConfig = {
   token: string;
 }
 
+/**
+ * This class defines what config.yaml should be. To get the config use
+ * Config.getConfig, if it doesn't already exist then genConfig will be
+ * called and return a default configuration.
+ */
 export class Config {
   public static readonly rootDir = `${process.cwd()}/config`;
   public static readonly defPath = `${Config.rootDir}/config.yaml`;
@@ -34,6 +46,8 @@ export class Config {
     this.discord = {
       token: '',
       prefix: '!minecraft',
+      role_id: '',
+      guild_id: '',
     };
     this.webserver = {
       token: uuid(),
@@ -42,7 +56,7 @@ export class Config {
   }
 
   public static getConfig(location?: string): Config {
-    if (!fs.existsSync(Config.defPath)) {
+    if (fs.existsSync(Config.defPath)) {
       const buffer = fs.readFileSync(location || Config.defPath);
       return yaml.parse(
         buffer.toString()
@@ -64,7 +78,8 @@ export class Config {
     );
 
     console.log(
-      "Default config generated, be sure to configure it before continuing"
+      "Config: Default config generated, be sure to configure it before" +
+      " continuing"
     );
 
     return config;

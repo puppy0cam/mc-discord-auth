@@ -20,6 +20,8 @@ npm run setup
 # ... configure config/config.yaml
 # Required:
 # * Set the Discord bot token
+# * Set the Discord server (guild_id)
+# * Set the required Discord role (role_id)
 # * Make sure the webserver port is valid
 
 # Finally run start
