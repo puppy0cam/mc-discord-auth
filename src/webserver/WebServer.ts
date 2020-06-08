@@ -6,6 +6,7 @@
  * @author Dylan Hackworth <dhpf@pm.me>
  */
 import express, { Express, NextFunction, Request, Response } from 'express';
+import { v4 as uuid } from 'uuid';
 import { WebServerConfig } from "../common/Config";
 import { Bot } from "../discord/Bot";
 import { noBodyError, noPlayerID, playerIDType } from "./errors";
@@ -61,6 +62,16 @@ export class WebServer {
    */
   private checkAuth(req: Request, res: Response, next: NextFunction) {
     const auth = req.header('Authorization');
+    const reqID = uuid();
+    // @ts-ignore
+    req['id'] = reqID;
+
+    console.log(
+      `Incoming Request "${reqID}"\n` +
+      ` - Endpoint: [${req.method}] ${req.path}\n` +
+      ` - User-Agent: ${req.header('User-Agent')}\n` +
+      ` - Content-Type: ${req.header('Content-Type')}`
+    )
 
     if (!auth) {
       res.status(203);
@@ -94,6 +105,13 @@ export class WebServer {
    * @param next
    */
   private static validateBody(req: Request, res: Response, next: NextFunction) {
+    // @ts-ignore
+    const reqID = req['id'];
+
+    console.log(
+      `Validating Body for Request "${reqID}"`
+    );
+
     if (req.body == undefined) {
       res.status(400);
       res.send(noBodyError);
@@ -107,17 +125,22 @@ export class WebServer {
     if (playerUUID == undefined) {
       res.status(400);
       res.send(noPlayerID);
+      console.log(`Response for "${reqID}"\n` + noPlayerID);
       res.end();
       return;
     } else if (typeof playerUUID != 'string') {
       res.status(400);
       res.send(playerIDType);
+      console.log(`Response for "${reqID}"\n` + playerIDType);
       res.end();
       return;
     }
 
     // @ts-ignore
     req['player_id'] = playerUUID;
+    console.log(
+      `Validated Request `
+    )
     next();
   }
 
@@ -129,6 +152,8 @@ export class WebServer {
    */
   private async isValidPlayer(req: Request, res: Response) {
     // @ts-ignore
+    const reqID = req['id'];
+    // @ts-ignore
     const playerUUID = req['player_id'];
 
     try {
@@ -138,12 +163,14 @@ export class WebServer {
       res.status(200);
       if (isTierThree) {
         res.send(isValid);
+        console.log(`Response for "${reqID}"\n` + isValid);
         res.end();
       } else {
         const body: isNotValid = {
           valid: false,
           reason: "no_role"
         };
+        console.log(`Response for "${reqID}"\n` + body);
         res.send(body);
       }
       res.status(200);
@@ -154,12 +181,13 @@ export class WebServer {
         valid: false,
         reason: 'no_link'
       };
+      console.log(`Response for "${reqID}"\n` + body);
       if (err instanceof NoDiscordAccError) {
         res.status(200);
         res.send(body);
         res.end()
       } else {
-        res.status(500);
+        res.status(200);
         res.send(body);
         res.end();
       }

@@ -235,7 +235,7 @@ export class Bot {
 
     for (const roleID of member.roles.cache.keys()) {
       let isWhitelisted = this.whitelist.includes(roleID);
-
+      
       if (isWhitelisted) {
         return true;
       }
