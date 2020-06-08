@@ -4,10 +4,10 @@
  * @license GPLv3
  * @author Dylan Hackworth <dhpf@pm.me>
  */
-import { Client } from 'discord.js';
 import type { GuildMember, Message } from 'discord.js';
+import { Client } from 'discord.js';
 import * as mc from '../minecraft';
-import { DBController, AlreadyLinkedError, NoMcAccError } from '../db';
+import { AlreadyLinkedError, DBController, NoMcAccError } from '../db';
 import { DiscordConfig } from "../common/Config";
 
 
@@ -233,9 +233,7 @@ export class Bot {
     if (member == null)
       return false;
 
-    const role = await member.roles.cache.has(this.reqRole);
-
-    return role != null;
+    return member.roles.cache.has(this.reqRole);
   }
 }
 
