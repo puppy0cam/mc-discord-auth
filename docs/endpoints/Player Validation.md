@@ -1,7 +1,7 @@
 ## POST /isPlayerValid
 Possible Errors:
- * [Missing Player UUID Attribute](#Missing Player UUID Attribute)
- * [Invalid Player UUID Attribute Type](#Invalid Player UUID Attribute Type)
+ * [Missing Player UUID Attribute](#Missing-Player-UUID-Attribute)
+ * [Invalid Player UUID Attribute Type](#Invalid-Player-UUID-Attribute-Type)
 
 This endpoint checks if a player is allowed to join the Minecraft server.
 

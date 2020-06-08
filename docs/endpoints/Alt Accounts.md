@@ -4,8 +4,8 @@ These endpoints are for enforcing the authenticator to allow players to join
 
 ## GET /getAltsOf/:owner
 Possible Errors:
- * [Missing Owner Attribute](#Missing Owner Attribute)
- * [Invalid Owner Attribute Type](#Invalid Owner Attribute Type)
+ * [Missing Owner Attribute](#Missing-Owner-Attribute)
+ * [Invalid Owner Attribute Type](#Invalid-Owner-Attribute-Type)
 
 ### Request Body
 Required Headers:
@@ -29,11 +29,11 @@ ie `GET http://127.0.0.1/getAltsOf/notch`
 
 ## POST /newAlt
 Possible Errors:
- * [Missing Owner Attribute](#Missing Owner Attribute)
- * [Invalid Owner Attribute Type](#Invalid Owner Attribute Type)
- * [Missing Player Name Attribute](#Missing Player Name Attribute)
- * [Invalid Player Name Type Attribute](#Invalid Player Name Attribute Type)
- * [Alt Already Added Error](#Alt Already Added Error)
+ * [Missing Owner Attribute](#Missing-Owner-Attribute)
+ * [Invalid Owner Attribute Type](#Invalid-Owner-Attribute-Type)
+ * [Missing Player Name Attribute](#Missing-Player-Name-Attribute)
+ * [Invalid Player Name Type Attribute](#Invalid-Player-Name-Attribute-Type)
+ * [Alt Already Added Error](#Alt-Already-Added-Error)
 
 ### Request Body
 Required Headers:
