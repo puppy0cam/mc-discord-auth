@@ -28,6 +28,13 @@ npm run setup
 npm start
 ```
 
+Finally add the
+[supported plugin](https://github.com/dhghf/mc-discord-auth-client) into
+your Spigot Minecraft server plugins directory. In it's config provide it
+the right address and port where this server is running, then for the
+token take the webserver token from the [config](./config/config.yaml) 
+and put it in the plugin's config. 
+
 ## Notes
 If you need to set a different location for the config.yaml simply add an
 environment variable "CONFIG_PATH" to the new location.
