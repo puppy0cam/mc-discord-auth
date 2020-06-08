@@ -5,7 +5,7 @@
   "license": "GPL-3.0",
   "scripts": {
     "setup": "tsc && node ./dist/app.js --INIT",
-    "start": "node ./dist/app.js",
+    "start": "tsc && node ./dist/app.js",
     "test": "tsc && npm run start"
   },
   "devDependencies": {
