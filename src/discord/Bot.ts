@@ -143,15 +143,31 @@ export class Bot {
   }
 
   public async status(msg: Message) {
+    if (!msg.guild)
+      return;
+
     const statusEmbed = new MessageEmbed();
     const banned = this.db.bans.getAll().length;
     const linked = this.db.links.getAllDiscordAccs().length;
+    let adminRoles = '**Admin Roles**\n';
+    let whitelist = '**Whitelist Roles**\n';
+    for (const adminRole of this.adminRoles) {
+      const role = await msg.guild.roles.fetch(adminRole);
+      if (role)
+        adminRoles += ` - ${role.name}\n`
+    }
+    for (const whitelisted of this.whitelist) {
+      const role = await msg.guild.roles.fetch(whitelisted);
+      if (role)
+        whitelist += ` - ${role.name}\n`
+    }
+
     statusEmbed.setTitle("Bot Status");
     statusEmbed.setTimestamp(Date.now());
     statusEmbed.setDescription(
-      (this.maintenance ? "**Maintenance Mode is On**\n" : "") +
-      `Banned Bot Usage Members: ${banned}\n` +
-      `Linked Accounts: ${linked}\n`
+      (this.maintenance ? "**Maintenance Mode is On**\n\n" : "") +
+      `**Linked Accounts** ${linked}\n\n` +
+      adminRoles + '\n' + whitelist
     );
     statusEmbed.setColor(
       this.maintenance ? 0xFFD500 : 0x76EE00

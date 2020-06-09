@@ -63,10 +63,8 @@ export class AdminCommands {
         await msg.reply(
           `Unlinked ${target.user.username}'s claimed Minecraft account
           `);
-      } else {
-        await msg.reply("Please mention a member you want to unlink");
+        return;
       }
-      return;
     }
 
     // Check if they're talking about a Minecraft account
@@ -77,7 +75,8 @@ export class AdminCommands {
       this.db.links.unlinkMcAcc(playerUUID);
       await msg.reply(`Unlinked "${playerName}"`);
     } catch (err) {
-      await msg.reply("That's not a valid Minecraft player name");
+      await msg.reply("Please provide a valid Discord user or Minecraft" +
+        " player");
     }
   }
 
