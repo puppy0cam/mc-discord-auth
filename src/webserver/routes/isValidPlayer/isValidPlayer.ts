@@ -1,5 +1,5 @@
 import * as express from 'express';
-import { isNotValid, isValid } from "../../responses";
+import { isNotValid, isValid } from "./responses";
 import { NoDiscordAccError } from "../../../db";
 import { NextFunction, Request, Response } from "express";
 import { noBodyError } from "../../errors";
