@@ -1,5 +1,14 @@
+/**
+ * @LICENSE GPL-3.0
+ * @author Dylan Hackworth <dhpf@pm.me>
+ */
 import { Database } from "better-sqlite3";
 
+
+/**
+ * This manages the "bans" table in the database. This table basically
+ * prevents users from managing the bot when their ID shows up here.
+ */
 export class BanTable {
   private readonly tableName = "bans";
 
@@ -7,6 +16,7 @@ export class BanTable {
 
   /**
    * This bans a member
+   * @returns {boolean} If it was added successfully
    */
   public ban(id: string): boolean {
     const info = this.db.prepare(
@@ -46,6 +56,7 @@ export class BanTable {
 
   /**
    * This lifts a ban
+   * @returns {boolean} If it was lifted successfully
    */
   public pardon(id: string): boolean {
     const info = this.db.prepare(

@@ -1,8 +1,16 @@
+/**
+ * @LICENSE GPL-3.0
+ * @author Dylan Hackworth <dhpf@pm.me>
+ */
 import { Bot } from "./Bot";
 import { DBController } from "../db";
 import { Message } from "discord.js";
 import * as mc from "../minecraft";
 
+
+/**
+ * These are all the admin-related commands
+ */
 export class AdminCommands {
   private readonly bot: Bot;
   private readonly db: DBController;
@@ -82,7 +90,6 @@ export class AdminCommands {
 
   /**
    * This toggles maintenance mode.
-   * @param msg
    */
   public async maintenance(msg: Message) {
     if (!msg.member)
@@ -105,7 +112,6 @@ export class AdminCommands {
 
   /**
    * This is the ban command
-   * @param msg
    */
   public async ban(msg: Message) {
     if (!msg.mentions.members || !msg.member)
@@ -136,7 +142,6 @@ export class AdminCommands {
 
   /**
    * This is the pardon command
-   * @param msg
    */
   public async pardon(msg: Message) {
     if (!msg.mentions.members || !msg.member)

@@ -1,6 +1,6 @@
 /**
  * Database controller class
- * @license GNU GPLv3
+ * @LICENSE GPL-3.0
  * @author Dylan Hackworth <dhpf@pm.me>
  */
 import sql from 'better-sqlite3';
@@ -13,9 +13,10 @@ import { BanTable } from "./tables/banned";
 
 
 /**
- * This class controls the SQLite3 database currently it only manages one
- * table which is "account_links" it makes sure that links don't already
- * exist when creating a new one and also keeping them valid.
+ * Each table is split into it's own public property
+ * @property {AltsTable} alts This manages the alts table in the db
+ * @property {BanTable} bans This manages the bans table in the db
+ * @property {LinksTable} links This manages the links
  */
 export class DBController {
   public static readonly rootDir = `${process.cwd()}/config`;

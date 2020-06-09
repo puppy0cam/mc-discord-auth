@@ -1,8 +1,15 @@
+/**
+ * @LICENSE GPL-3.0
+ * @author Dylan Hackworth <dhpf@pm.me>
+ */
 import { Bot } from "./Bot";
 import { Message } from "discord.js";
 import * as mc from "../minecraft";
 import { AlreadyLinkedError, DBController, NoMcAccError } from "../db";
 
+/**
+ * These are all the regular commands
+ */
 export class Commands {
   private readonly bot: Bot;
   private readonly db: DBController;
@@ -109,8 +116,6 @@ export class Commands {
     }
 
   }
-
-
 
   /**
    * This is the whoami command

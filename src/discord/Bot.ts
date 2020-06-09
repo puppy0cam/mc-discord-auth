@@ -1,7 +1,7 @@
 /**
  * This is the Bot module it interfaces with Discord to communicate with
  * users. Everything related to Discord can be found in this file.
- * @license GPLv3
+ * @license GPL-3.0
  * @author Dylan Hackworth <dhpf@pm.me>
  */
 import type { GuildMember, Message } from 'discord.js';
@@ -263,6 +263,10 @@ export class Bot {
       return Bot.hasRole(member, this.whitelist);
   }
 
+  /**
+   * If they have a given role in a list
+   * @returns {boolean}
+   */
   private static hasRole(member: GuildMember, roles: string[]): boolean {
     for (const roleID of member.roles.cache.keys()) {
       let isWhitelisted = roles.includes(roleID);

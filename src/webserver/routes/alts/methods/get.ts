@@ -1,7 +1,16 @@
+/**
+ * @LICENSE GPL-3.0
+ * @author Dylan Hackworth <dhpf@pm.me>
+ */
 import { NextFunction, Request, Response } from "express";
 import { WebServer } from "../../../WebServer";
 import { ownerType, noOwner } from "../errors";
+import { altAccs } from "../responses";
 
+
+/**
+ * GET /getAltsOf/:owner handler
+ */
 export async function getReq(req: Request, res: Response) {
   // @ts-ignore
   const reqID = req['id'];
@@ -12,7 +21,7 @@ export async function getReq(req: Request, res: Response) {
 
   // result is an array of player names owned by the owner
   const result = webServer.db.alts.getAlts(owner);
-  const body = { alt_accs: result };
+  const body: altAccs = { alt_accs: result };
 
   console.log(`Response for "${reqID}"\n`, body);
 
@@ -21,6 +30,9 @@ export async function getReq(req: Request, res: Response) {
   res.end();
 }
 
+/**
+ * This checks the :owner path parameter in a given HTTP request
+ */
 export function checkGetReq(req: Request, res: Response, next: NextFunction, owner: any) {
   // @ts-ignore
   const reqID = req['id'];

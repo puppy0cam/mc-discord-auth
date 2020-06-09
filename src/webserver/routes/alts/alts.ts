@@ -11,12 +11,17 @@ import { checkGetReq, getReq } from "./methods/get";
 
 export const altsRoute = express.Router();
 
-
+// POST /newAlt (body integrity check)
 altsRoute.post('/newAlt', checkPostReq);
+// POST /newAlt endpoint handler
 altsRoute.post('/newAlt', postReq);
 
+// DELETE /delAlt (body integrity check)
 altsRoute.delete('/delAlt', checkDelReq);
+// DELETE /delAlt handler
 altsRoute.delete('/delAlt', delReq);
 
+// :owner path parameter
 altsRoute.param('owner', checkGetReq)
+// GET /getAltsOf/:owner handler
 altsRoute.get('/getAltsOf/:owner', getReq);

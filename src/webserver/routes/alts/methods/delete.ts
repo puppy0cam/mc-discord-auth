@@ -1,8 +1,16 @@
+/**
+ * @LICENSE GPL-3.0
+ * @author Dylan Hackworth <dhpf@pm.me>
+ */
 import { NextFunction, Request, Response } from "express";
 import { noBodyError, noPlayerName, playerNameType } from "../../../errors";
 import { WebServer } from "../../../WebServer";
 import { isDeletedRes } from "../responses";
 
+
+/**
+ * DELETE /delAlt endpoint handler
+ */
 export async function delReq(req: Request, res: Response) {
   // @ts-ignore
   const reqID = req['id'];
@@ -22,6 +30,9 @@ export async function delReq(req: Request, res: Response) {
   res.end();
 }
 
+/**
+ * This checks the body of a given HTTP request
+ */
 export function checkDelReq(req: Request, res: Response, next: NextFunction) {
   // @ts-ignore
   const reqID = req['id'];
@@ -29,6 +40,7 @@ export function checkDelReq(req: Request, res: Response, next: NextFunction) {
 
   res.setHeader('Content-Type', 'application/json')
 
+  // Check if they provided a body
   if (!body) {
     res.status(401);
     console.log(`Response for "${reqID}"\n`, noBodyError);
@@ -38,6 +50,7 @@ export function checkDelReq(req: Request, res: Response, next: NextFunction) {
 
   const playerName = body['player_name'];
 
+  // Check if they provided the player name to remove
   if (!playerName) {
     res.status(401);
     console.log(`Response for "${reqID}"\n`, noPlayerName);

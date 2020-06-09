@@ -1,10 +1,11 @@
 /**
  * This module communicates with Mojang API servers to get a player's UUID
  * & player name. This code is has been copied from one of projects
- * matrix-appservice-minecraft
  *
  * matrix-appservice-minecraft:
  * @link https://github.com/dhghf/matrix-appservice-minecraft/blob/develop/src/minecraft/internal/Player.ts
+ * @LICENSE GPL-3.0
+ * @author Dylan Hackworth <dhpf@pm.me>
  */
 import bent, { RequestFunction } from 'bent';
 

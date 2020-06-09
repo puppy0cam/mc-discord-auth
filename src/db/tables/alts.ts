@@ -7,6 +7,10 @@ export type AltAcc = {
   alt_name: string;
 }
 
+/**
+ * This is the Alt Account Management database table. Here is where to
+ * access the table.
+ */
 export class AltsTable {
   private readonly tableName = "alts"
 

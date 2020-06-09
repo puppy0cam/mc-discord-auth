@@ -1,3 +1,8 @@
+/**
+ * These are all the errors that can occur during alt management
+ * @license GNU GPLv3
+ * @author Dylan Hackworth <dhpf@pm.me>
+ */
 import { WebServerError } from "../../errors";
 
 export const noOwner: WebServerError = {

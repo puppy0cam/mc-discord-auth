@@ -1,3 +1,7 @@
+/**
+ * @LICENSE GPL-3.0
+ * @author Dylan Hackworth <dhpf@pm.me>
+ */
 import * as express from 'express';
 import { isNotValid, isValid } from "./responses";
 import { NoDiscordAccError } from "../../../db";
@@ -13,7 +17,11 @@ isValidPlayer.post('/isValidPlayer', express.json());
 
 isValidPlayer.use('/isValidPlayer', validateBody);
 
-isValidPlayer.use('/isValidPlayer', async (req, res) => {
+/**
+ * POST /isValidPlayer
+ * This is the isValidPlayer endpoint handler.
+ */
+isValidPlayer.post('/isValidPlayer', async (req, res) => {
   // @ts-ignore
   const reqID: string = req['id'];
   // @ts-ignore
@@ -72,6 +80,9 @@ isValidPlayer.use('/isValidPlayer', async (req, res) => {
   }
 });
 
+/**
+ * This checks the integrity of the body in a given request.
+ */
 function validateBody(req: Request, res: Response, next: NextFunction) {
   // @ts-ignore
   const reqID = req['id'];

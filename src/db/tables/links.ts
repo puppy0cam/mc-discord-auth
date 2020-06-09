@@ -1,3 +1,7 @@
+/**
+ * @LICENSE GPL-3.0
+ * @author Dylan Hackworth <dhpf@pm.me>
+ */
 import sql from 'better-sqlite3';
 import { Snowflake } from "discord.js";
 import {
@@ -7,6 +11,10 @@ import {
 } from "../errors";
 
 
+/**
+ * This manages the account_links table. It associates Minecraft and
+ * Discord accounts.
+ */
 export class LinksTable {
   private readonly tableName = 'account_links';
 
@@ -97,6 +105,10 @@ export class LinksTable {
     return (info.changes > 0);
   }
 
+  /**
+   * This gets every Discord user ID in the database
+   * @returns {string[]} Discord user ID array
+   */
   public getAllDiscordAccs(): string[] {
     const rows = this.db.prepare(
       `SELECT discord FROM ${this.tableName}`
@@ -117,7 +129,12 @@ export class LinksTable {
     ).run();
   }
 
-  public unlinkMcAcc(playerUUID: string) {
+  /**
+   * This unassociated a Minecraft UUID with whatever it's associated with.
+   * @param {string} playerUUID Player UUID to remove from the database
+   * @returns {boolean} if it was successful or not
+   */
+  public unlinkMcAcc(playerUUID: string): boolean {
     const info = this.db.prepare(
       `DELETE FROM ${this.tableName} WHERE minecraft=?`
     ).run(playerUUID);

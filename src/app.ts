@@ -1,5 +1,5 @@
 /**
- * @license GNU GPLv3
+ * @LICENSE GPL-3.0
  * @author Dylan Hackworth <dhpf@pm.me>
  */
 import { Bot } from "./discord/Bot";

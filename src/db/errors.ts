@@ -1,3 +1,9 @@
+/**
+ * These are all the database errors that can occur
+ * @LICENSE GPL-3.0
+ * @author Dylan Hackworth <dhpf@pm.me>
+ */
+
 export class NoMcAccError extends Error {
   constructor() {
     super("This Discord account isn't linked with a Minecraft account");

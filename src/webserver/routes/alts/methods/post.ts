@@ -1,3 +1,7 @@
+/**
+ * @LICENSE GPL-3.0
+ * @author Dylan Hackworth <dhpf@pm.me>
+ */
 import { NextFunction, Request, Response } from "express";
 import { noBodyError, noPlayerName, playerNameType } from "../../../errors";
 import {
@@ -9,6 +13,9 @@ import { WebServer } from "../../../WebServer";
 import * as mc from "../../../../minecraft";
 
 
+/**
+ * POST /newAlt endpoint handler
+ */
 export async function postReq(req: Request, res: Response) {
   // @ts-ignore
   const reqID = req['id'];
@@ -42,6 +49,9 @@ export async function postReq(req: Request, res: Response) {
 }
 
 
+/**
+ * This checks the given body of an HTTP request
+ */
 export function checkPostReq(req: Request, res: Response, next: NextFunction) {
   // @ts-ignore
   const reqID = req['id'];
@@ -49,6 +59,7 @@ export function checkPostReq(req: Request, res: Response, next: NextFunction) {
 
   res.setHeader('Content-Type', 'application/json');
 
+  // Check if they provided a body
   if (!body) {
     res.status(401);
     res.send(noBodyError);
@@ -59,6 +70,7 @@ export function checkPostReq(req: Request, res: Response, next: NextFunction) {
 
   const playerName = req.body['player_name'];
 
+  // Check if they provided a valid player name
   if (!playerName) {
     res.status(401);
     res.send(noPlayerName);
@@ -75,6 +87,7 @@ export function checkPostReq(req: Request, res: Response, next: NextFunction) {
 
   const owner = req.body['owner'];
 
+  // Check if they provided a valid owner attribute
   if (!owner) {
     res.status(401);
     res.send(noOwner);

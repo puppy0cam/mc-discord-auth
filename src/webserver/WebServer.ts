@@ -2,7 +2,7 @@
  * This module interfaces with Minecraft servers, servers can call the
  * "isPlayerValid" POST endpoint to see if a certain player (provided with
  * a UUID) is valid
- * @license GNU GPLv3
+ * @LICENSE GPL-3.0
  * @author Dylan Hackworth <dhpf@pm.me>
  */
 import express, { Express, NextFunction, Request, Response } from 'express';
