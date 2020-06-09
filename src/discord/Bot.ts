@@ -146,6 +146,9 @@ export class Bot {
     }
   }
 
+  /**
+   * This is the status command
+   */
   public async status(msg: Message) {
     if (!msg.guild)
       return;
@@ -182,8 +185,14 @@ export class Bot {
         adminRoles + '\n' + whitelist
       );
 
+      console.log(
+        "Status Request\n" +
+        ` - Linked Accounts: ${linked}\n` +
+        adminRoles + '\n' + whitelist
+      );
 
-      await msg.channel.send({ embed: statusEmbed });
+
+      await msg.channel.send("**Bot Status Report**", { embed: statusEmbed });
     }
   }
 
