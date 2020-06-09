@@ -50,8 +50,8 @@ Empty (200 OK)
 
 ## DELETE /delAlt
 Possible Errors:
- * [Missing Player Name Attribute](#Missing Player Name Attribute)
- * [Invalid Player Name Type Attribute](#Invalid Player Name Attribute Type)
+ * [Missing Player Name Attribute](#Missing-Player-Name-Attribute)
+ * [Invalid Player Name Type Attribute](#Invalid-Player-Name-Attribute-Type)
 
 ### Request Body
 Required Headers:
