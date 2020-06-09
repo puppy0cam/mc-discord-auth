@@ -150,33 +150,41 @@ export class Bot {
     if (!msg.guild)
       return;
 
+    if (!( await this.isAnAdmin(msg.member as GuildMember) ))
+      return;
+
     const statusEmbed = new MessageEmbed();
     const linked = this.db.links.getAllDiscordAccs().length;
     let adminRoles = '**Admin Roles**\n';
     let whitelist = '**Whitelist Roles**\n';
-    for (const adminRole of this.adminRoles) {
-      const role = await msg.guild.roles.fetch(adminRole);
-      if (role)
-        adminRoles += ` - ${role.name}\n`
-    }
-    for (const whitelisted of this.whitelist) {
-      const role = await msg.guild.roles.fetch(whitelisted);
-      if (role)
-        whitelist += ` - ${role.name}\n`
-    }
 
     statusEmbed.setTitle("Bot Status");
     statusEmbed.setTimestamp(Date.now());
-    statusEmbed.setDescription(
-      (this.maintenance ? "**Maintenance Mode is On**\n\n" : "") +
-      `**Linked Accounts** ${linked}\n\n` +
-      adminRoles + '\n' + whitelist
-    );
     statusEmbed.setColor(
       this.maintenance ? 0xFFD500 : 0x76EE00
     );
 
-    await msg.reply({ embed: statusEmbed });
+    try {
+      for (const adminRole of this.adminRoles) {
+        const role = await msg.guild.roles.fetch(adminRole);
+        if (role)
+          adminRoles += ` - ${role.name}\n`
+      }
+      for (const whitelisted of this.whitelist) {
+        const role = await msg.guild.roles.fetch(whitelisted);
+        if (role)
+          whitelist += ` - ${role.name}\n`
+      }
+    } finally {
+      statusEmbed.setDescription(
+        (this.maintenance ? "**Maintenance Mode is On**\n\n" : "") +
+        `**Linked Accounts** ${linked}\n\n` +
+        adminRoles + '\n' + whitelist
+      );
+
+
+      await msg.channel.send({ embed: statusEmbed });
+    }
   }
 
   public maintenanceMode(): boolean {
