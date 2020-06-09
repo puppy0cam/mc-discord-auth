@@ -12,11 +12,12 @@ export async function getReq(req: Request, res: Response) {
 
   // result is an array of player names owned by the owner
   const result = webServer.db.alts.getAlts(owner);
+  const body = { alt_accs: result };
 
-  console.log(`Response for "${reqID}"\n`, result);
+  console.log(`Response for "${reqID}"\n`, body);
 
   res.status(200);
-  res.send(result);
+  res.send(body);
   res.end();
 }
 
