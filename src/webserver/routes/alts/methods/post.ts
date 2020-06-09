@@ -3,11 +3,14 @@
  * @author Dylan Hackworth <dhpf@pm.me>
  */
 import { NextFunction, Request, Response } from "express";
-import { noBodyError, noPlayerName, playerNameType } from "../../../errors";
+import { noBodyError } from "../../../errors";
 import {
   altAlreadyAdded,
   ownerType,
   noOwner,
+  invalidOwner,
+  noPlayerName,
+  playerNameType,
 } from "../errors";
 import { WebServer } from "../../../WebServer";
 import * as mc from "../../../../minecraft";
@@ -25,9 +28,9 @@ export async function postReq(req: Request, res: Response) {
   const owner: string = req['owner'];
   // @ts-ignore
   const webServer: WebServer = req['webserver'];
-  const playerUUID: string = await mc.getUUID(playerName);
 
   try {
+  	const playerUUID: string = await mc.getUUID(playerName);
     const isAdded = webServer.db.alts.addAnAlt(
       owner,
       playerUUID,
@@ -40,12 +43,20 @@ export async function postReq(req: Request, res: Response) {
     res.status(200);
     res.end();
   } catch (err) {
-    res.status(401);
-    res.send(altAlreadyAdded);
-    console.log(`Response for "${reqID}"\n`, altAlreadyAdded);
-    res.end();
+    if (err instanceof Error) {
+      if (err.message.includes("Incorrect statusCode")) {
+        res.status(401);
+        res.send(invalidOwner);
+        console.log(`Response for "${reqID}"\n`, invalidOwner);
+        res.end();
+      }
+    } else {
+      res.status(401);
+      res.send(altAlreadyAdded);
+      console.log(`Response for "${reqID}"\n`, altAlreadyAdded);
+      res.end();
+    }
   }
-
 }
 
 

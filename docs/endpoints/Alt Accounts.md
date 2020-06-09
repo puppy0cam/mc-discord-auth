@@ -31,6 +31,7 @@ ie `GET http://127.0.0.1/getAltsOf/notch`
 Possible Errors:
  * [Missing Owner Attribute](#Missing-Owner-Attribute)
  * [Invalid Owner Attribute Type](#Invalid-Owner-Attribute-Type)
+ * [Invalid Owner](#Invalid-Owner)
  * [Missing Player Name Attribute](#Missing-Player-Name-Attribute)
  * [Invalid Player Name Type Attribute](#Invalid-Player-Name-Attribute-Type)
  * [Alt Already Added Error](#Alt-Already-Added-Error)
@@ -100,6 +101,14 @@ Required Headers:
 {
   "errcode": "OWNER_TYPE_ERROR",
   "message": "The owner attribute provided is not a string type"
+}
+```
+
+### Invalid Owner
+```json
+{
+	"errcode": "INVALID_OWNER",
+	"message": "The owner provided is not a valid player name"
 }
 ```
 
