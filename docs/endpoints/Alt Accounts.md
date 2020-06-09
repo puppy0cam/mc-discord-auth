@@ -87,7 +87,6 @@ Required Headers:
 }
 ```
 
-
 #### Missing Owner Attribute
 ```json
 {
@@ -105,7 +104,6 @@ Required Headers:
 ```
 
 ### Alt Already Added Error
-This occurs when the alt already exists in the database.
 ```json
 {
   "errcode": "ALT_ALREADY_ADDED",
