@@ -49,6 +49,11 @@ export async function postReq(req: Request, res: Response) {
         res.send(invalidOwner);
         console.log(`Response for "${reqID}"\n`, invalidOwner);
         res.end();
+      } else {
+      	res.status(401);
+	    res.send(altAlreadyAdded);
+	    console.log(`Response for "${reqID}"\n`, altAlreadyAdded);
+	    res.end();
       }
     } else {
       res.status(401);
