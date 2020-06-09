@@ -54,13 +54,13 @@ export class LinksTable {
       throw new NoDiscordAccError();
   }
 
-  public hasMcUUID(uuid: string): boolean {
-    const row = this.db.prepare(
-      `SELECT discord FROM ${this.tableName} WHERE minecraft=?`
-    ).get(uuid);
-
-    return row.discord != undefined;
-  }
+  // public hasMcUUID(uuid: string): boolean {
+  //   const row = this.db.prepare(
+  //     `SELECT discord FROM ${this.tableName} WHERE minecraft=?`
+  //   ).get(uuid);
+  //
+  //   return row != undefined;
+  // }
 
   public link(discordID: string, mcID: string) {
     const alreadyLinked = this.db.prepare(
@@ -89,12 +89,23 @@ export class LinksTable {
    * @param {string} discordID
    * @returns {boolean} If it was successfully unlinked.
    */
-  public unlink(discordID: string): boolean {
+  public unlinkDiscordAcc(discordID: string): boolean {
     const info = this.db.prepare(
       `DELETE FROM ${this.tableName} WHERE discord=?`
     ).run(discordID);
 
     return (info.changes > 0);
+  }
+
+  public getAllDiscordAccs(): string[] {
+    const rows = this.db.prepare(
+      `SELECT discord FROM ${this.tableName}`
+    ).all();
+    const result = []
+
+    for (const row of rows)
+      result.push(row.discord);
+    return result;
   }
 
   private init() {
@@ -104,5 +115,13 @@ export class LinksTable {
       'discord text PRIMARY KEY NOT NULL' +
       ')'
     ).run();
+  }
+
+  public unlinkMcAcc(playerUUID: string) {
+    const info = this.db.prepare(
+      `DELETE FROM ${this.tableName} WHERE minecraft=?`
+    ).run(playerUUID);
+
+    return (info.changes > 0);
   }
 }

@@ -9,6 +9,7 @@ import fs from 'fs';
 import { DBConfig } from "../common/Config";
 import { LinksTable } from "./tables/links";
 import { AltsTable } from "./tables/alts";
+import { BanTable } from "./tables/banned";
 
 
 /**
@@ -23,6 +24,7 @@ export class DBController {
   private readonly db: sql.Database;
   public readonly alts: AltsTable;
   public readonly links: LinksTable;
+  public readonly bans: BanTable;
 
   constructor(config: DBConfig) {
     if (!fs.existsSync(DBController.rootDir))
@@ -31,6 +33,7 @@ export class DBController {
     this.db = new sql(config.location);
     this.links = new LinksTable(this.db);
     this.alts = new AltsTable(this.db);
+    this.bans = new BanTable(this.db);
   }
 
 }

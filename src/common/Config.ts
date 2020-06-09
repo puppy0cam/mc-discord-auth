@@ -18,6 +18,7 @@ export type DiscordConfig = {
   guild_id: string;
   prefix: string;
   roles: string[];
+  admin_roles: string[];
   token: string;
 }
 
@@ -47,6 +48,7 @@ export class Config {
       token: '',
       prefix: '!minecraft',
       roles: ['role id 1', 'role id 2', 'role id 3'],
+      admin_roles: ['role id 1', 'role id 2'],
       guild_id: '',
     };
     this.webserver = {

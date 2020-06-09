@@ -5,10 +5,11 @@
  * @author Dylan Hackworth <dhpf@pm.me>
  */
 import type { GuildMember, Message } from 'discord.js';
-import { Client } from 'discord.js';
-import * as mc from '../minecraft';
-import { AlreadyLinkedError, DBController, NoMcAccError } from '../db';
+import { Client, MessageEmbed } from 'discord.js';
+import { DBController } from '../db';
 import { DiscordConfig } from "../common/Config";
+import { AdminCommands } from "./AdminCommands";
+import { Commands } from "./Commands";
 
 
 /**
@@ -16,12 +17,20 @@ import { DiscordConfig } from "../common/Config";
  * it call the start() method of a Bot object.
  */
 export class Bot {
+  public readonly prefix: string;
+  public maintenance: boolean;
+
   private readonly client: Client;
   private readonly guild: string;
   private readonly db: DBController;
-  private readonly prefix: string;
   private readonly whitelist: string[];
+  private readonly adminRoles: string[];
   private readonly token: string;
+
+  // Regular commands
+  private readonly commands: Commands;
+  // Admin commands
+  private readonly adminCommands: AdminCommands;
 
 
   constructor(db: DBController, config: DiscordConfig) {
@@ -29,8 +38,12 @@ export class Bot {
     this.guild = config.guild_id;
     this.whitelist = config.roles;
     this.db = db;
+    this.maintenance = false;
     this.prefix = config.prefix;
+    this.adminRoles = config.admin_roles;
     this.token = config.token;
+    this.commands = new Commands(this, db);
+    this.adminCommands = new AdminCommands(this, db);
   }
 
   /**
@@ -69,6 +82,13 @@ export class Bot {
 
     // Next let's see if they're communicating with our bot
     if (message.content.startsWith(this.prefix)) {
+      // Let's make sure they're not banned from using this bot
+      const isBanned = this.db.bans.isBanned(message.author.id);
+      if (isBanned) {
+        await message.reply("You're banned from using this bot.");
+        return;
+      }
+
       // Make sure they have the valid roles to talk to the bot / join the
       // MC server.
       const isValid = this.isValidMember(message.member);
@@ -84,123 +104,64 @@ export class Bot {
       const args = message.content.split(' ');
 
       switch (args[1]) {
+        // COMMANDS
         case 'link':
-          await this.link(message, args);
+          await this.commands.link(message, args);
           break;
         case 'unlink':
-          await this.unlink(message);
+          // admin version
+          if (args.length > 2)
+            await this.adminCommands.unlink(message, args);
+          // regular version
+          else
+            await this.commands.unlink(message, args);
           break;
         case 'whoami':
-          await this.whoami(message);
+          await this.commands.whoami(message);
+          break;
+          // ADMIN COMMANDS
+        case 'admin':
+          await this.adminCommands.help(message);
+          break;
+        case 'ban':
+          await this.adminCommands.ban(message);
+          break;
+        case 'pardon':
+          await this.adminCommands.pardon(message);
+          break;
+        case 'maintenance':
+          await this.adminCommands.maintenance(message);
+          break;
+        case 'status':
+          await this.status(message);
           break;
         case 'help':
         default:
-          await this.help(message);
+          await this.commands.help(message);
       }
     }
   }
 
-  /**
-   * This is the help command it prints all the available commands
-   * @param {Message} msg
-   */
-  private async help(msg: Message) {
-    await msg.reply(
-      "Available Commands:\n" +
-      ` - ${this.prefix} link <Minecraft player name> To associate your` +
-      ` Discord account with your provided Minecraft account\n` +
-      ` - ${this.prefix} unlink\n` +
-      ` - ${this.prefix} help\n` +
-      ` - ${this.prefix} whoami For debugging purposes`
+  public async status(msg: Message) {
+    const statusEmbed = new MessageEmbed();
+    const banned = this.db.bans.getAll().length;
+    const linked = this.db.links.getAllDiscordAccs().length;
+    statusEmbed.setTitle("Bot Status");
+    statusEmbed.setTimestamp(Date.now());
+    statusEmbed.setDescription(
+      (this.maintenance ? "**Maintenance Mode is On**\n" : "") +
+      `Banned Bot Usage Members: ${banned}\n` +
+      `Linked Accounts: ${linked}\n`
     );
+    statusEmbed.setColor(
+      this.maintenance ? 0xFFD500 : 0x76EE00
+    );
+
+    await msg.reply({ embed: statusEmbed });
   }
 
-  /**
-   * This is the link command it attempts to associate with a Discord
-   * user's ID with the provided Minecraft account that the user gives.
-   * @param {Message} msg Message to respond to
-   * @param {string[]} args Args should look like this:
-   * ["<bot prefix>", "link", "<minecraft player name"]
-   */
-  private async link(msg: Message, args: string[]) {
-    // Make sure this command is being executed in a Discord server
-    if (!msg.member)
-      return;
-
-    // This means they didn't provide a player name in the message:
-    // args = ["<bot prefix>", "link", "<mc player name>" || undefined]
-    if (args.length == 1) {
-      await msg.reply(
-        "Please provide a Minecraft player name " +
-        `ie \`${this.prefix} link dylan\``
-      );
-      return;
-    }
-
-    // This is where the function starts after sanity checking
-    const playerName = args[2];
-
-    try {
-      const uuid = await mc.getUUID(playerName);
-
-      if (uuid) {
-        this.db.links.link(msg.author.id, uuid);
-        await msg.reply("Linked.");
-      } else {
-        await msg.reply(`Failed to get UUID of "${playerName}"`)
-      }
-
-    } catch (err) {
-      let errResponse: string;
-      if (err instanceof AlreadyLinkedError) {
-        switch (err.account) {
-          case 'both':
-            errResponse = 'Your Discord account is already linked with the' +
-              ' provided Minecraft account';
-            break;
-          case 'discord':
-            errResponse = 'Your Discord account is already linked with' +
-              ' another Minecraft account';
-            break;
-          case 'minecraft':
-            errResponse = 'The provided Minecraft account is already linked' +
-              ' with another Discord account.';
-            break;
-        }
-      } else {
-        errResponse = `"${playerName}" is an invalid player name.`;
-      }
-
-      await msg.reply(errResponse);
-    }
-  }
-
-  /**
-   * This is the unlink command
-   * @param {Message} msg Message to respond to
-   */
-  private async unlink(msg: Message) {
-    const unlinked = this.db.links.unlink(msg.author.id);
-
-    if (unlinked)
-      await msg.reply("You've been unlinked.");
-    else
-      await msg.reply("You were never linked with an account.");
-  }
-
-  private async whoami(msg: Message) {
-    try {
-      const uuid = this.db.links.getMcID(msg.author.id);
-      const name = await mc.getName(uuid);
-
-      await msg.reply(`You're linked as "${name}"`);
-
-    } catch (err) {
-      if (NoMcAccError)
-        await msg.reply("You're not linked with any account.");
-      else
-        await msg.reply("Something went wrong.");
-    }
+  public maintenanceMode(): boolean {
+    return (this.maintenance = !this.maintenance);
   }
 
   /**
@@ -220,12 +181,10 @@ export class Bot {
   }
 
   /**
-   * This checks if the Discord server member has the tier three role
-   * @param {GuildMember | string} resolvable The server member or their ID.
-   * @returns {Promise<boolean>}
-   * @throws {Error} if it can't get the guild that the bot is serving.
+   * Checks if the given Discord server member is an admin
+   * @param resolvable
    */
-  public async isValidMember(resolvable: GuildMember | string): Promise<boolean> {
+  public async isAnAdmin(resolvable: GuildMember | string): Promise<boolean> {
     let member: GuildMember | null;
 
     if (typeof resolvable == 'string') {
@@ -237,8 +196,36 @@ export class Bot {
     if (member == null)
       return false;
 
+    return Bot.hasRole(member, this.adminRoles);
+  }
+
+  /**
+   * This checks if the Discord server member is on the whitelist
+   * @param {GuildMember | string} resolvable The server member or their ID.
+   * @returns {Promise<boolean>}
+   * @throws {Error} if it can't get the guild that the bot is serving.
+   */
+  public isValidMember(resolvable: GuildMember | string): boolean {
+    let member: GuildMember | null;
+
+    if (typeof resolvable == 'string') {
+      member = this.resolveMember(resolvable);
+    } else {
+      member = resolvable;
+    }
+
+    if (member == null)
+      return false;
+
+    if (this.maintenance) {
+      return Bot.hasRole(member, this.adminRoles);
+    } else
+      return Bot.hasRole(member, this.whitelist);
+  }
+
+  private static hasRole(member: GuildMember, roles: string[]): boolean {
     for (const roleID of member.roles.cache.keys()) {
-      let isWhitelisted = this.whitelist.includes(roleID);
+      let isWhitelisted = roles.includes(roleID);
 
       if (isWhitelisted) {
         return true;
@@ -247,4 +234,3 @@ export class Bot {
     return false;
   }
 }
-
