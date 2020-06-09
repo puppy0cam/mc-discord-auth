@@ -27,11 +27,12 @@ This means they failed authentication
 | Attribute | Type    | Description                                      |
 |-----------|---------|--------------------------------------------------|
 | valid     | boolean | Whether or not the given player is ready to play |
-| reason    | string  | The reason will be be 'no_link' or 'no_role'     |
+| reason    | string  | Possible reasons are described below             |
 
  - "no_link": The Minecraft player hasn't linked their Discord account.
  - "no_role": They fail to have the required roles on Discord to join the
   Minecraft server.
+ - "maintenance": The bot is in maintenance mode meaning only admin's can join.
 
 #### Valid Player - Response
 This means they can play on the Minecraft server.

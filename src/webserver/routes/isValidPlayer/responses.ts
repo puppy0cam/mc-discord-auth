@@ -7,4 +7,4 @@ export type isNotValid = {
   reason: notValidReason;
 }
 
-export type notValidReason = 'no_link' | 'no_role';
+export type notValidReason = 'no_link' | 'no_role' | 'maintenance';

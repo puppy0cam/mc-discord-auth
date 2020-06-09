@@ -93,9 +93,13 @@ export class Bot {
       // MC server.
       const isValid = this.isValidMember(message.member);
       if (!isValid) {
-        await message.reply(
-          "You don't have the required roles to run this bot."
-        );
+        if (!this.maintenance) {
+          await message.reply("Bot is in maintenance mode.");
+        } else {
+          await message.reply(
+            "You don't have the required roles to run this bot."
+          );
+        }
         return
       }
 
@@ -147,7 +151,6 @@ export class Bot {
       return;
 
     const statusEmbed = new MessageEmbed();
-    const banned = this.db.bans.getAll().length;
     const linked = this.db.links.getAllDiscordAccs().length;
     let adminRoles = '**Admin Roles**\n';
     let whitelist = '**Whitelist Roles**\n';
@@ -178,6 +181,10 @@ export class Bot {
 
   public maintenanceMode(): boolean {
     return (this.maintenance = !this.maintenance);
+  }
+
+  public isMaintenanceMode(): boolean {
+    return this.maintenance;
   }
 
   /**

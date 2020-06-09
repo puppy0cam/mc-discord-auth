@@ -34,17 +34,19 @@ isValidPlayer.use('/isValidPlayer', async (req, res) => {
 
   try {
     const discordID = webserver.db.links.getDiscordID(playerUUID);
-    const isTierThree = await webserver.discord.isValidMember(discordID);
+    const isAuthed = webserver.discord.isValidMember(discordID);
+    const adminOnlyRn = webserver.discord.isMaintenanceMode();
 
     res.status(200);
-    if (isTierThree) {
+
+    if (isAuthed) {
       res.send(isValid);
       console.log(`Response for "${reqID}"\n`, isValid);
       res.end();
     } else {
       const body: isNotValid = {
         valid: false,
-        reason: "no_role"
+        reason: adminOnlyRn ? "maintenance" : "no_role"
       };
       console.log(`Response for "${reqID}"\n`, body);
       res.send(body);
