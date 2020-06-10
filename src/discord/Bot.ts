@@ -123,7 +123,7 @@ export class Bot {
         case 'whoami':
           await this.commands.whoami(message);
           break;
-          // ADMIN COMMANDS
+        // ADMIN COMMANDS
         case 'admin':
           await this.adminCommands.help(message);
           break;

@@ -126,7 +126,14 @@ export class Commands {
       const uuid = this.db.links.getMcID(msg.author.id);
       const name = await mc.getName(uuid);
 
-      await msg.reply(`You're linked as "${name}"`);
+      await msg.reply(
+        "Your details: ```json\n" +
+        `{\n` +
+        `  "uuid": "${uuid}",\n` +
+        `  "name": "${name}"\n` +
+        `}\n` +
+        "```"
+      );
 
     } catch (err) {
       if (NoMcAccError)
