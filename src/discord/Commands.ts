@@ -140,7 +140,7 @@ export class Commands {
       } else if (err instanceof AlreadyAuthCode) {
         errResponse = "Please join the Minecraft server to get your authentication " +
           "code"
-      } else if (err.message.includes("invalid code")) {
+      } else if (err.message.includes("Incorrect statusCode")) {
         errResponse = `"${playerName}" is an invalid player name.`;
       } else {
         console.log("Bot: Link Error", err);
