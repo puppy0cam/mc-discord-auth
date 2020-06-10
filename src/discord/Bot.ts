@@ -42,6 +42,7 @@ export class Bot {
   private readonly token: string;
   private readonly commands: Commands;
   private readonly adminCommands: AdminCommands;
+  private readonly version = "2.0.2";
 
 
   constructor(db: DBController, config: DiscordConfig) {
@@ -179,7 +180,8 @@ export class Bot {
     let adminRoles = '**Admin Roles**\n';
     let whitelist = '**Whitelist Roles**\n';
 
-    statusEmbed.setTitle("Bot Status");
+    statusEmbed.setTitle(`Mc Discord Auth ${this.version}`);
+    statusEmbed.setURL("https://github.com/dhghf/mc-discord-auth");
     statusEmbed.setTimestamp(Date.now());
     statusEmbed.setColor(
       this.isMaintenanceMode() ? 0xFFD500 : 0x76EE00
