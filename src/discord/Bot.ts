@@ -28,8 +28,8 @@ import { Commands } from "./Commands";
  */
 export class Bot {
   public readonly prefix: string;
-  
-  private readonly maintenance: boolean;
+
+  private maintenance: boolean;
   private readonly client: Client;
   private readonly guild: string;
   private readonly db: DBController;
@@ -175,7 +175,7 @@ export class Bot {
     statusEmbed.setTitle("Bot Status");
     statusEmbed.setTimestamp(Date.now());
     statusEmbed.setColor(
-      this.maintenance ? 0xFFD500 : 0x76EE00
+      this.isMaintenanceMode() ? 0xFFD500 : 0x76EE00
     );
 
     try {
