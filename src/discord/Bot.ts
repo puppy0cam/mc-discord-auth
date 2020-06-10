@@ -15,21 +15,28 @@ import { Commands } from "./Commands";
 /**
  * This is the Discord bot that communicates with Discord users. To start
  * it call the start() method of a Bot object.
+ * @property {Client} client Discord API Client
+ * @property {boolean} maintenance Whether or not maintenance is on
+ * @property {DBController} db Database interface
+ * @property {string[]} whitelist Whitelisted roles. Members with one of these
+ *   roles can use bot commands and access the Minecraft server.
+ * @property {string[]} adminRoles Members with one of these roles can use bot 
+ *   admin commands.
+ * @property {string} token Discord bot access token
+ * @property {Commands} commands Regular commands
+ * @property {AdminCommands} adminCommands Admin commands
  */
 export class Bot {
   public readonly prefix: string;
-  public maintenance: boolean;
-
+  
+  private readonly maintenance: boolean;
   private readonly client: Client;
   private readonly guild: string;
   private readonly db: DBController;
   private readonly whitelist: string[];
   private readonly adminRoles: string[];
   private readonly token: string;
-
-  // Regular commands
   private readonly commands: Commands;
-  // Admin commands
   private readonly adminCommands: AdminCommands;
 
 
@@ -57,9 +64,13 @@ export class Bot {
     // emitted here.
     this.client.on('message', this.onMessage.bind(this));
 
-    this.client.on('ready', () => {
+    this.client.on('ready', async () => {
+      const serving = await this.client.guilds.cache.get(this.guild);
+
       if (this.client.user)
         console.log("Bot: Ready as " + this.client.user.username)
+      if (serving)
+        console.log(`Bot: Serving Guild "${serving.name}"`);
     })
 
     // Finally login into the Discord API gateway to start receiving and
@@ -196,10 +207,17 @@ export class Bot {
     }
   }
 
+  /**
+   * This is the maintenance command, it toggles "maintenance mode".
+   * Bot admin can only run this command.
+   */
   public maintenanceMode(): boolean {
     return (this.maintenance = !this.maintenance);
   }
 
+  /**
+   * Checks if "maintenance mode" is enabled
+   */
   public isMaintenanceMode(): boolean {
     return this.maintenance;
   }
@@ -222,7 +240,8 @@ export class Bot {
 
   /**
    * Checks if the given Discord server member is an admin
-   * @param resolvable
+   * @param {GuildMember | string} resolvable Discord user ID or GuildMember
+   *  object
    */
   public async isAnAdmin(resolvable: GuildMember | string): Promise<boolean> {
     let member: GuildMember | null;
@@ -241,7 +260,8 @@ export class Bot {
 
   /**
    * This checks if the Discord server member is on the whitelist
-   * @param {GuildMember | string} resolvable The server member or their ID.
+   * @param {GuildMember | string} resolvable Discord user ID or GuildMember
+   *  object
    * @returns {Promise<boolean>}
    * @throws {Error} if it can't get the guild that the bot is serving.
    */
