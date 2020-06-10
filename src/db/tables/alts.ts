@@ -56,6 +56,23 @@ export class AltsTable {
     return row != undefined;
   }
 
+  public getAllAlts(): AltAcc[] {
+    const rows = this.db.prepare(
+      `SELECT * FROM ${this.tableName}`
+    ).all();
+    const result: AltAcc[] = [];
+
+    for (const row of rows) {
+      result.push({
+        alt_name: row.alt_name,
+        alt_id: row.alt_id,
+        owner: row.owner
+      });
+    }
+
+    return result;1
+  }
+
   public getAlts(owner: string): AltAcc[] {
     const rows = this.db.prepare(
       `SELECT * FROM ${this.tableName} WHERE owner=?`

@@ -42,7 +42,7 @@ export class Bot {
   private readonly token: string;
   private readonly commands: Commands;
   private readonly adminCommands: AdminCommands;
-  private readonly version = "2.0.2";
+  private readonly version = "2.0.3";
 
 
   constructor(db: DBController, config: DiscordConfig) {
@@ -177,6 +177,8 @@ export class Bot {
 
     const statusEmbed = new MessageEmbed();
     const linked = this.db.links.getAllDiscordAccs().length;
+    const alts = this.db.alts.getAllAlts().length;
+    const authCodes = this.db.auth.getAllAuthCodes().length;
     let adminRoles = '**Admin Roles**\n';
     let whitelist = '**Whitelist Roles**\n';
 
@@ -199,18 +201,18 @@ export class Bot {
           whitelist += ` - ${role.name}\n`
       }
     } finally {
-      statusEmbed.setDescription(
-        (this.maintenance ? "**Maintenance Mode is On**\n\n" : "") +
-        `**Linked Accounts** ${linked}\n\n` +
+      const desc = (this.maintenance ? "**Maintenance Mode is On**\n\n" : "") +
+        `**Linked Accounts** ${linked}\n` +
+        `**Alt Accounts** ${alts}\n` +
+        `**Pending Auth Codes** ${authCodes}\n` +
+        `**Banned Discord Accounts**\n` +
         adminRoles + '\n' + whitelist
-      );
+
+      statusEmbed.setDescription(desc);
 
       console.log(
-        "Status Request\n" +
-        ` - Linked Accounts: ${linked}\n` +
-        adminRoles + '\n' + whitelist
+        "Status Request\n" + desc
       );
-
 
       await msg.channel.send("**Bot Status Report**", { embed: statusEmbed });
     }

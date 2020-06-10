@@ -3,6 +3,12 @@ import { v1 as uuid } from 'uuid';
 import { AlreadyAuthCode } from "../errors";
 
 
+export type AuthCodeProfile = {
+  discordID: string;
+  authCode: string;
+  playerUUID: string;
+}
+
 export class AuthCodes {
   private readonly tableName = "auth_codes";
 
@@ -22,6 +28,24 @@ export class AuthCodes {
       return row.auth_code;
     else
       return null;
+  }
+
+  public getAllAuthCodes(): AuthCodeProfile[] {
+    const rows = this.db.prepare(
+      `SELECT * FROM ${this.tableName}`
+    ).all();
+    const result: AuthCodeProfile[] = [];
+
+    for (const row of rows) {
+      result.push({
+        discordID: row.discord_id,
+        authCode: row.auth_code,
+        playerUUID: row.minecraft_id
+      });
+    }
+
+
+    return result;
   }
 
   /**
