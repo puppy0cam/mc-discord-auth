@@ -107,7 +107,6 @@ export class Bot {
       // Make sure they have the valid roles to talk to the bot / join the
       // MC server.
       const isValid = this.isValidMember(message.member)
-        || this.isAnAdmin(message.member);
       if (!isValid) {
         if (this.maintenance) {
           await message.reply("Bot is in maintenance mode.");
@@ -310,7 +309,12 @@ export class Bot {
       if (isAuthed) {
         return { valid: true }
       } else {
-        return { valid: false, reason: 'no_role' };
+        const isAdmin = Bot.hasRole(member, this.adminRoles);
+
+        if (isAdmin)
+          return { valid: true};
+        else
+          return { valid: false, reason: 'no_role' };
       }
     }
   }
