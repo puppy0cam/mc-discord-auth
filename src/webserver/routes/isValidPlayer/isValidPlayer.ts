@@ -46,9 +46,9 @@ isValidPlayer.post('/isValidPlayer', async (req: Request, res: Response) => {
 
     if (linkedDiscord) {
       // let's see if they're a verified member
-      const validation = webserver.discord.isValidMember(linkedDiscord);
-
-      res.send(validation);
+      const body = webserver.discord.isValidMember(linkedDiscord);
+      console.log(`Response for "${reqID}"\n`, body);
+      res.send(body);
       res.end();
     } else {
       // let's see if this person has an auth code
