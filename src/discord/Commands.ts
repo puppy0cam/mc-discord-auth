@@ -107,6 +107,7 @@ export class Commands {
 
     try {
       const playerUUID = await mc.getUUID(playerName);
+      this.db.links.checkIfLinked(msg.author.id, playerUUID);
 
       if (playerUUID) {
         this.db.auth.newAuthCode(msg.author.id, playerUUID);

@@ -92,6 +92,23 @@ export class LinksTable {
     ).run(discordID, mcID);
   }
 
+  public checkIfLinked(discordID?: string, minecraftID?: string) {
+    const alreadyLinked = this.db.prepare(
+      `SELECT * FROM ${this.tableName} WHERE discord=? OR minecraft=?`
+    ).get(discordID || '', minecraftID || '');
+
+    // This means a provided identifier is already linked with another account.
+    if (alreadyLinked) {
+      if (alreadyLinked.discord == discordID) {
+        throw new AlreadyLinkedError('both');
+      } else if (alreadyLinked.minecraft) {
+        throw new AlreadyLinkedError('minecraft');
+      } else {
+        throw new AlreadyLinkedError('discord');
+      }
+    }
+  }
+
   /**
    * Unlinks the provided Discord ID with anything it was linked with
    * @param {string} discordID
