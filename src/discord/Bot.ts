@@ -10,6 +10,10 @@ import { DBController } from '../db';
 import { DiscordConfig } from "../common/Config";
 import { AdminCommands } from "./AdminCommands";
 import { Commands } from "./Commands";
+import {
+  isNotValid,
+  isValid
+} from "../webserver/routes/isValidPlayer/responses";
 
 
 /**
@@ -121,6 +125,9 @@ export class Bot {
 
       switch (args[1]) {
         // COMMANDS
+        case 'auth':
+          await this.commands.auth(message, args);
+          break;
         case 'link':
           await this.commands.link(message, args);
           break;
@@ -266,7 +273,7 @@ export class Bot {
    * @returns {Promise<boolean>}
    * @throws {Error} if it can't get the guild that the bot is serving.
    */
-  public isValidMember(resolvable: GuildMember | string): boolean {
+  public isValidMember(resolvable: GuildMember | string): isNotValid | isValid {
     let member: GuildMember | null;
 
     if (typeof resolvable == 'string') {
@@ -276,17 +283,36 @@ export class Bot {
     }
 
     if (member == null)
-      return false;
+      return {
+        reason: 'no_link', valid: false
+      };
 
     const isBanned = this.db.bans.isBanned(member.id);
     // No Banned Users
     if (isBanned)
-      return isBanned;
+      return {
+        reason: 'banned', valid: false
+      };
 
     if (this.maintenance) {
-      return Bot.hasRole(member, this.adminRoles);
-    } else
-      return Bot.hasRole(member, this.whitelist);
+      const isAdmin = Bot.hasRole(member, this.adminRoles);
+
+      if (isAdmin) {
+        return { valid: true };
+      } else {
+        return {
+          valid: false,
+          reason: 'maintenance'
+        };
+      }
+    } else {
+      const isAuthed = Bot.hasRole(member, this.whitelist);
+      if (isAuthed) {
+        return { valid: true }
+      } else {
+        return { valid: false, reason: 'no_role' };
+      }
+    }
   }
 
   /**

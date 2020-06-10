@@ -33,6 +33,17 @@ This means they failed authentication
  - "no_role": They fail to have the required roles on Discord to join the
   Minecraft server.
  - "maintenance": The bot is in maintenance mode meaning only admin's can join.
+ - "banned": This person is banned from using the bot and auth server.
+ - "auth_code": This code needs to authorize their linkage
+ 
+ 
+ #### Invalid Player - Please Auth Response
+ | Attribute | Type    | Description                                      |
+ |-----------|---------|--------------------------------------------------|
+ | valid     | boolean | Whether or not the given player is ready to play |
+ | reason    | string  | Only is "auth_code"                              |
+ | auth_code | string  | The auth code they must provide the Discord bot  |
+
 
 #### Valid Player - Response
 This means they can play on the Minecraft server.

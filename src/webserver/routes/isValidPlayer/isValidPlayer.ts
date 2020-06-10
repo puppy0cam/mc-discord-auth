@@ -3,8 +3,7 @@
  * @author Dylan Hackworth <dhpf@pm.me>
  */
 import * as express from 'express';
-import { isNotValid, isValid } from "./responses";
-import { NoDiscordAccError } from "../../../db";
+import { isNotValid, authCodeRes, isValid } from "./responses";
 import { NextFunction, Request, Response } from "express";
 import { noBodyError } from "../../errors";
 import { noPlayerID, playerIDType } from "../../errors";
@@ -21,7 +20,7 @@ isValidPlayer.use('/isValidPlayer', validateBody);
  * POST /isValidPlayer
  * This is the isValidPlayer endpoint handler.
  */
-isValidPlayer.post('/isValidPlayer', async (req, res) => {
+isValidPlayer.post('/isValidPlayer', async (req: Request, res: Response) => {
   // @ts-ignore
   const reqID: string = req['id'];
   // @ts-ignore
@@ -32,51 +31,53 @@ isValidPlayer.post('/isValidPlayer', async (req, res) => {
   // Let's check if they're a valid alt account
   const isAnAlt = webserver.db.alts.isAnAlt(playerUUID);
 
+  res.status(200);
+
   if (isAnAlt) {
-    res.status(200);
-    res.send(isValid);
-    console.log(`Response for "${reqID}" (ALT)\n`, isValid);
+    const body: isValid = { valid: true };
+    res.send(body);
+    console.log(`Response for "${reqID}" (ALT)\n`, body);
     res.end();
     return;
   }
 
   try {
-    const discordID = webserver.db.links.getDiscordID(playerUUID);
-    const isAuthed = webserver.discord.isValidMember(discordID);
-    const adminOnlyRn = webserver.discord.isMaintenanceMode();
+    const linkedDiscord = webserver.db.links.getDiscordID(playerUUID);
 
-    res.status(200);
-
-    if (isAuthed) {
-      res.send(isValid);
-      console.log(`Response for "${reqID}"\n`, isValid);
-      res.end();
-    } else {
-      const body: isNotValid = {
-        valid: false,
-        reason: adminOnlyRn ? "maintenance" : "no_role"
-      };
+    if (linkedDiscord) {
+      // let's see if they're a verified member
+      const body = webserver.discord.isValidMember(linkedDiscord);
       console.log(`Response for "${reqID}"\n`, body);
       res.send(body);
-    }
-    res.status(200);
-    res.end();
-
-  } catch (err) {
-    let body: isNotValid = {
-      valid: false,
-      reason: 'no_link'
-    };
-    console.log(`Response for "${reqID}"\n`, body);
-    if (err instanceof NoDiscordAccError) {
-      res.status(200);
-      res.send(body);
-      res.end()
-    } else {
-      res.status(200);
-      res.send(body);
       res.end();
+    } else {
+      // let's see if this person has an auth code
+      const authCode = webserver.db.auth.getAuthCode(playerUUID);
+
+      if (authCode) {
+        const body: authCodeRes = {
+          reason: 'auth_code',
+          valid: false,
+          auth_code: authCode
+        };
+        res.send(body);
+        console.log(`Response for "${reqID}"\n`, body);
+        res.end();
+      } else {
+        const body: isNotValid = {
+          reason: 'no_link',
+          valid: false
+        };
+        console.log(`Response for "${reqID}"\n`, body);
+        res.send(body);
+        res.end();
+      }
     }
+  } catch (err) {
+    res.status(500);
+    res.send();
+    console.log(`Error while handling request "${reqID}"\n`, err);
+    res.end();
   }
 });
 
