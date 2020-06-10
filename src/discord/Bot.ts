@@ -20,7 +20,7 @@ import { Commands } from "./Commands";
  * @property {DBController} db Database interface
  * @property {string[]} whitelist Whitelisted roles. Members with one of these
  *   roles can use bot commands and access the Minecraft server.
- * @property {string[]} adminRoles Members with one of these roles can use bot 
+ * @property {string[]} adminRoles Members with one of these roles can use bot
  *   admin commands.
  * @property {string} token Discord bot access token
  * @property {Commands} commands Regular commands
@@ -102,9 +102,10 @@ export class Bot {
 
       // Make sure they have the valid roles to talk to the bot / join the
       // MC server.
-      const isValid = this.isValidMember(message.member);
+      const isValid = this.isValidMember(message.member)
+        || this.isAnAdmin(message.member);
       if (!isValid) {
-        if (!this.maintenance) {
+        if (this.maintenance) {
           await message.reply("Bot is in maintenance mode.");
         } else {
           await message.reply(
@@ -243,7 +244,7 @@ export class Bot {
    * @param {GuildMember | string} resolvable Discord user ID or GuildMember
    *  object
    */
-  public async isAnAdmin(resolvable: GuildMember | string): Promise<boolean> {
+  public isAnAdmin(resolvable: GuildMember | string): boolean {
     let member: GuildMember | null;
 
     if (typeof resolvable == 'string') {
@@ -276,6 +277,11 @@ export class Bot {
 
     if (member == null)
       return false;
+
+    const isBanned = this.db.bans.isBanned(member.id);
+    // No Banned Users
+    if (isBanned)
+      return isBanned;
 
     if (this.maintenance) {
       return Bot.hasRole(member, this.adminRoles);
