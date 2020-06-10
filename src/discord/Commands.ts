@@ -168,7 +168,7 @@ export class Commands {
       this.db.links.unlinkDiscordAcc(msg.author.id);
       await msg.reply("Unlinked.");
     } else {
-      await msg.reply()
+      await msg.reply("Please provide a Minecraft player name");
     }
 
   }

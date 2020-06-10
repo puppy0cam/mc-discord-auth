@@ -69,8 +69,7 @@ export class AdminCommands {
       if (target) {
         this.db.links.unlinkDiscordAcc(target.id);
         await msg.reply(
-          `Unlinked ${target.user.username}'s claimed Minecraft account
-          `);
+          `Unlinked ${target.user.username}'s claimed Minecraft account`);
         return;
       }
     }
