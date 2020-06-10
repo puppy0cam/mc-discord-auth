@@ -49,7 +49,7 @@ export class LinksTable {
    * @throws {NoDiscordAccError} if the provided Minecraft player ID isn't
    * associated with a Discord account.
    */
-  public getDiscordID(uuid: string): string {
+  public getDiscordID(uuid: string): string | null {
     const row = this.db.prepare(
       `SELECT discord FROM ${this.tableName} WHERE minecraft=?`
     ).get(uuid);
@@ -59,7 +59,7 @@ export class LinksTable {
     if (discordID)
       return discordID;
     else
-      throw new NoDiscordAccError();
+      return null;
   }
 
   // public hasMcUUID(uuid: string): boolean {

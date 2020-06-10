@@ -10,11 +10,13 @@ import { DBConfig } from "../common/Config";
 import { LinksTable } from "./tables/links";
 import { AltsTable } from "./tables/alts";
 import { BanTable } from "./tables/banned";
+import { AuthCodes } from "./tables/authCodes";
 
 
 /**
  * Each table is split into it's own public property
  * @property {AltsTable} alts This manages the alts table in the db
+ * @property {AuthCodes} auth Authentication code manager
  * @property {BanTable} bans This manages the bans table in the db
  * @property {LinksTable} links This manages the links
  */
@@ -24,6 +26,7 @@ export class DBController {
 
   private readonly db: sql.Database;
   public readonly alts: AltsTable;
+  public readonly auth: AuthCodes;
   public readonly links: LinksTable;
   public readonly bans: BanTable;
 
@@ -33,6 +36,7 @@ export class DBController {
 
     this.db = new sql(config.location);
     this.links = new LinksTable(this.db);
+    this.auth = new AuthCodes(this.db);
     this.alts = new AltsTable(this.db);
     this.bans = new BanTable(this.db);
   }

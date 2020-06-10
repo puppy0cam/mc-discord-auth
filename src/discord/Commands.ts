@@ -5,7 +5,12 @@
 import { Bot } from "./Bot";
 import { Message } from "discord.js";
 import * as mc from "../minecraft";
-import { AlreadyLinkedError, DBController, NoMcAccError } from "../db";
+import {
+  AlreadyAuthCode,
+  AlreadyLinkedError,
+  DBController,
+  NoMcAccError
+} from "../db";
 
 /**
  * These are all the regular commands
@@ -18,6 +23,36 @@ export class Commands {
     this.bot = bot;
     this.db = db;
   }
+
+
+  /**
+   * This is the auth command
+   * @param msg
+   * @param {string[]} args Possible iterations:
+   * * ["<bot prefix>", "auth"]
+   * * ["<bot prefix>", "auth", "<auth code>"]
+   */
+  public async auth(msg: Message, args: string[]) {
+    if (!msg.member)
+      return;
+
+    if (args.length > 1) {
+      const authCode = args[2];
+      const playerUUID = this.db.auth.authorizedCode(msg.author.id, authCode);
+
+      if (playerUUID) {
+        this.db.links.link(msg.author.id, playerUUID);
+        await msg.reply("Linked.");
+      } else {
+        await msg.reply("Invalid authentication code");
+      }
+
+
+    } else {
+      await msg.reply("Please provide an authentication code");
+    }
+  }
+
 
   /**
    * This is the help command it prints all the available commands
@@ -60,19 +95,33 @@ export class Commands {
 
     // This is where the function starts after sanity checking
     const playerName = args[2];
+    const hasAnAuthCode = this.db.auth.hasAuthCode(msg.author.id);
+
+    if (hasAnAuthCode) {
+      await msg.reply(
+        "Please join the Minecraft server to get your authentication " +
+        "code"
+      );
+      return;
+    }
 
     try {
-      const uuid = await mc.getUUID(playerName);
+      const playerUUID = await mc.getUUID(playerName);
 
-      if (uuid) {
-        this.db.links.link(msg.author.id, uuid);
-        await msg.reply("Linked.");
+      if (playerUUID) {
+        this.db.auth.newAuthCode(msg.author.id, playerUUID);
+
+        await msg.reply(
+          "Please join the Minecraft server to get your authentication " +
+          `code. (Like so: \`${this.bot.prefix} auth <auth code>\``
+        );
       } else {
-        await msg.reply(`Failed to get UUID of "${playerName}"`)
+        await msg.reply(`Failed to get UUID of "${playerName}"`);
       }
 
     } catch (err) {
       let errResponse: string;
+
       if (err instanceof AlreadyLinkedError) {
         switch (err.account) {
           case 'both':
@@ -88,8 +137,14 @@ export class Commands {
               ' with another Discord account.';
             break;
         }
-      } else {
+      } else if (err instanceof AlreadyAuthCode) {
+        errResponse = "Please join the Minecraft server to get your authentication " +
+          "code"
+      } else if (err.message.includes("invalid code")) {
         errResponse = `"${playerName}" is an invalid player name.`;
+      } else {
+        console.log("Bot: Link Error", err);
+        errResponse = "An unexpected error has occurred";
       }
 
       await msg.reply(errResponse);
