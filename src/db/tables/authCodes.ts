@@ -1,3 +1,7 @@
+/**
+ * @license GPL-3.0
+ * @author Dylan Hackworth <dhpf@pm.me>
+ */
 import { Database } from "better-sqlite3";
 import { v1 as uuid } from 'uuid';
 import { AlreadyAuthCode } from "../errors";
@@ -46,6 +50,14 @@ export class AuthCodes {
 
 
     return result;
+  }
+
+  public removeAuth(discordID: string): boolean {
+    const info = this.db.prepare(
+      `DELETE FROM ${this.tableName} WHERE discord_id=?`
+    ).run(discordID);
+
+    return (info.changes > 0);
   }
 
   /**

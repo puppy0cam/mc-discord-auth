@@ -166,6 +166,7 @@ export class Commands {
     // args = ["<bot prefix>", "unlink"]
     if (args.length == 2) {
       this.db.links.unlinkDiscordAcc(msg.author.id);
+      this.db.auth.removeAuth(msg.author.id);
       await msg.reply("Unlinked.");
     } else {
       await msg.reply("Please provide a Minecraft player name");

@@ -42,7 +42,7 @@ export class Bot {
   private readonly token: string;
   private readonly commands: Commands;
   private readonly adminCommands: AdminCommands;
-  private readonly version = "2.0.3";
+  private readonly version = "2.0.4";
 
 
   constructor(db: DBController, config: DiscordConfig) {
@@ -179,6 +179,7 @@ export class Bot {
     const linked = this.db.links.getAllDiscordAccs().length;
     const alts = this.db.alts.getAllAlts().length;
     const authCodes = this.db.auth.getAllAuthCodes().length;
+    const banned = this.db.bans.getAll().length;
     let adminRoles = '**Admin Roles**\n';
     let whitelist = '**Whitelist Roles**\n';
 
@@ -205,7 +206,7 @@ export class Bot {
         `**Linked Accounts** ${linked}\n` +
         `**Alt Accounts** ${alts}\n` +
         `**Pending Auth Codes** ${authCodes}\n` +
-        `**Banned Discord Accounts**\n` +
+        `**Banned Discord Accounts** ${banned}\n` +
         adminRoles + '\n' + whitelist
 
       statusEmbed.setDescription(desc);
