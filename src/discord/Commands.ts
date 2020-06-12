@@ -3,7 +3,7 @@
  * @author Dylan Hackworth <dhpf@pm.me>
  */
 import { Bot } from "./Bot";
-import { Message } from "discord.js";
+import { Message, TextChannel } from "discord.js";
 import * as mc from "../minecraft";
 import {
   AlreadyAuthCode,
@@ -180,18 +180,7 @@ export class Commands {
    */
   public async whoami(msg: Message) {
     try {
-      const uuid = this.db.links.getMcID(msg.author.id);
-      const name = await mc.getName(uuid);
-
-      await msg.reply(
-        "Your details: ```json\n" +
-        `{\n` +
-        `  "uuid": "${uuid}",\n` +
-        `  "name": "${name}"\n` +
-        `}\n` +
-        "```"
-      );
-
+      await this.bot.whoIs(msg.author, msg.channel as TextChannel);
     } catch (err) {
       if (NoMcAccError)
         await msg.reply("You're not linked with any account.");

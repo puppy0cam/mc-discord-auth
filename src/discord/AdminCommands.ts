@@ -4,7 +4,7 @@
  */
 import { Bot } from "./Bot";
 import { DBController } from "../db";
-import { Message } from "discord.js";
+import { Message, TextChannel } from "discord.js";
 import * as mc from "../minecraft";
 
 
@@ -36,7 +36,8 @@ export class AdminCommands {
         ` - ${bot.prefix} maintenance Toggles "maintenance mode"\n` +
         ` - ${bot.prefix} ban <@discord member> Ban bot usage\n` +
         ` - ${bot.prefix} pardon <@discord member>\n` +
-        ` - ${bot.prefix} status Display debug info`
+        ` - ${bot.prefix} status Display debug info\n` +
+        ` - ${bot.prefix} whois <@discord member> Displays debug info of someone else`
       );
     } else {
       await msg.reply("You're not an admin.");
@@ -165,6 +166,26 @@ export class AdminCommands {
 
     } else {
       await msg.reply("Mention the member you would like to pardon.")
+    }
+  }
+
+  /**
+   * This is the whois command
+   */
+  public async whois(msg: Message) {
+    if (!msg.mentions.members || !msg.member)
+      return;
+
+    const member = msg.mentions.members.first();
+
+    try {
+      if (member) {
+        await this.bot.whoIs(member.user, msg.channel as TextChannel);
+      } else {
+        await msg.reply("Please mention somebody");
+      }
+    } catch (err) {
+      await msg.reply("That account isn't linked with anything.");
     }
   }
 }

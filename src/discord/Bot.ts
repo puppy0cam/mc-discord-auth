@@ -5,7 +5,7 @@
  * @author Dylan Hackworth <dhpf@pm.me>
  */
 import type { GuildMember, Message } from 'discord.js';
-import { Client, MessageEmbed } from 'discord.js';
+import { Client, MessageEmbed, TextChannel, User } from 'discord.js';
 import { DBController } from '../db';
 import { DiscordConfig } from "../common/Config";
 import { AdminCommands } from "./AdminCommands";
@@ -14,6 +14,7 @@ import {
   isNotValid,
   isValid
 } from "../webserver/routes/isValidPlayer/responses";
+import * as mc from "../minecraft";
 
 
 /**
@@ -158,6 +159,9 @@ export class Bot {
         case 'status':
           await this.status(message);
           break;
+        case 'whois':
+          await this.adminCommands.whois(message);
+          break;
         case 'help':
         default:
           await this.commands.help(message);
@@ -206,7 +210,7 @@ export class Bot {
         `**Linked Accounts** ${linked}\n` +
         `**Alt Accounts** ${alts}\n` +
         `**Pending Auth Codes** ${authCodes}\n` +
-        `**Banned Discord Accounts** ${banned}\n` +
+        `**Banned Accounts** ${banned}\n` +
         adminRoles + '\n' + whitelist
 
       statusEmbed.setDescription(desc);
@@ -217,6 +221,23 @@ export class Bot {
 
       await msg.channel.send("**Bot Status Report**", { embed: statusEmbed });
     }
+  }
+
+  /**
+   * This returns the "whois" of someone
+   */
+  public async whoIs(user: User, channel: TextChannel) {
+    const uuid = this.db.links.getMcID(user.id);
+    const name = await mc.getName(uuid);
+
+    await channel.send(
+      "```json\n" +
+      `{\n` +
+      `  "uuid": "${uuid}",\n` +
+      `  "name": "${name}"\n` +
+      `}\n` +
+      "```"
+    );
   }
 
   /**
