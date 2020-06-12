@@ -43,7 +43,7 @@ export class Bot {
   private readonly token: string;
   private readonly commands: Commands;
   private readonly adminCommands: AdminCommands;
-  private readonly version = "2.0.4";
+  private readonly version = "2.0.5";
 
 
   constructor(db: DBController, config: DiscordConfig) {
