@@ -20,3 +20,12 @@ game.
 
 ## WebServer Endpoints
 See [Endpoints.md](./docs/Endpoints.md)
+
+## Version Scheme:
+`x.y.z`
+ - x: Major update, production should update
+   * major bugs
+ - y: Minor update, production can update
+   * bugs
+ - z: A small patch was made, production doesn't need to update
+   * insignificant change
