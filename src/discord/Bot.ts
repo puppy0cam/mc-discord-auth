@@ -15,6 +15,7 @@ import {
   isValid
 } from "../webserver/routes/isValidPlayer/responses";
 import * as mc from "../minecraft";
+const pkg = require('../../package.json');
 
 
 /**
@@ -43,7 +44,7 @@ export class Bot {
   private readonly token: string;
   private readonly commands: Commands;
   private readonly adminCommands: AdminCommands;
-  private readonly version = "2.0.5";
+  private readonly version = pkg.version;
 
 
   constructor(db: DBController, config: DiscordConfig) {
