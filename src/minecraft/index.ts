@@ -60,12 +60,10 @@ type Profile = {
  * @returns {Promise<string>}
  */
 export async function getUUID(name: string): Promise<string> {
-  const getJSON = bent('json') as RequestFunction<UUID>;
-  const target = `https://api.mojang.com/users/profiles/minecraft/${name}`;
-  const res = await getJSON(target);
+  const getJSON = bent('https://api.mojang.com', 'POST', 'json', 200) as RequestFunction<UUID[]>;
+  const res = await getJSON('/profiles/minecraft', [name]);
 
-
-  return res.id;
+  return res[0].id;
 }
 
 /**
