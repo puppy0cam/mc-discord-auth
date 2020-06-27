@@ -11,6 +11,7 @@ import {
   DBController,
   NoMcAccError
 } from "../db";
+import { PlayerDoesNotExist } from "../minecraft";
 
 /**
  * These are all the regular commands
@@ -141,7 +142,7 @@ export class Commands {
       } else if (err instanceof AlreadyAuthCode) {
         errResponse = "Please join the Minecraft server to get your authentication " +
           "code"
-      } else if (err.message.includes("Incorrect statusCode")) {
+      } else if (err instanceof PlayerDoesNotExist || err.message.includes("Incorrect statusCode")) {
         errResponse = `"${playerName}" is an invalid player name.`;
       } else {
         console.log("Bot: Link Error", err);
