@@ -129,15 +129,6 @@ export class LinksTable {
     return result;
   }
 
-  private init() {
-    this.db.prepare(
-      `CREATE TABLE IF NOT EXISTS ${this.tableName} (` +
-      'minecraft text UNIQUE NOT NULL,' +
-      'discord text PRIMARY KEY NOT NULL' +
-      ')'
-    ).run();
-  }
-
   /**
    * This unassociated a Minecraft UUID with whatever it's associated with.
    * @param {string} playerUUID Player UUID to remove from the database
@@ -149,5 +140,14 @@ export class LinksTable {
     ).run(playerUUID);
 
     return (info.changes > 0);
+  }
+
+  private init() {
+    this.db.prepare(
+      `CREATE TABLE IF NOT EXISTS ${this.tableName} (` +
+      'minecraft text UNIQUE NOT NULL,' +
+      'discord text PRIMARY KEY NOT NULL' +
+      ')'
+    ).run();
   }
 }
