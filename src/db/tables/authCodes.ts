@@ -3,125 +3,63 @@
  * @author Dylan Hackworth <dhpf@pm.me>
  */
 import { Database } from "better-sqlite3";
-import { v1 as uuid } from 'uuid';
-import { AlreadyAuthCode } from "../errors";
+import { v1 as uuid } from "uuid";
 
-
-export type AuthCodeProfile = {
-  discordID: string;
-  authCode: string;
-  playerUUID: string;
+export type PendingAuthorisationInstance = {
+    auth_code: string;
+    mc_id: string;
 }
 
-export class AuthCodes {
-  private readonly tableName = "auth_codes";
+export class PendingAuthorisations {
+    private readonly tablename = "pending_authorisations";
 
-  constructor(private readonly db: Database) { this.init(); }
-
-  /**
-   * Gets the auth code associated with a given identifier
-   */
-  public getAuthCode(id: string): string | null {
-    const row = this.db.prepare(
-      `SELECT auth_code FROM ${this.tableName} WHERE discord_id=? ` +
-      `OR minecraft_id=?`
-    ).get(id, id);
-
-
-    if (row)
-      return row.auth_code;
-    else
-      return null;
-  }
-
-  public getAllAuthCodes(): AuthCodeProfile[] {
-    const rows = this.db.prepare(
-      `SELECT * FROM ${this.tableName}`
-    ).all();
-    const result: AuthCodeProfile[] = [];
-
-    for (const row of rows) {
-      result.push({
-        discordID: row.discord_id,
-        authCode: row.auth_code,
-        playerUUID: row.minecraft_id
-      });
+    constructor(private readonly db: Database) {
+        this.init();
     }
 
+    /**
+     * Gets the auth code associated wih a given Minecraft player id.
+     */
+    public getMinecraftPlayer(mc_id: string): PendingAuthorisationInstance | null {
+        const row: PendingAuthorisationInstance | null = this.db.prepare<[string]>(
+            `SELECT * FROM ${this.tablename} WHERE mc_id=?`,
+        ).get(mc_id);
 
-    return result;
-  }
-
-  public removeAuth(discordID: string): boolean {
-    const info = this.db.prepare(
-      `DELETE FROM ${this.tableName} WHERE discord_id=?`
-    ).run(discordID);
-
-    return (info.changes > 0);
-  }
-
-  /**
-   * Gets the auth code associated with a given
-   */
-  public getUUID(discordID: string): string | null {
-    const row = this.db.prepare(
-      `SELECT minecraft_id FROM ${this.tableName} WHERE discord_id=?`
-    ).get(discordID);
-
-    if (row)
-      return row.minecraft_id;
-    else
-      return null;
-  }
-
-  /**
-   * Checks to see if a given auth code is correct, it also deletes it from
-   * the table
-   */
-  public authorizedCode(discordID: string, authCode: string): string | null {
-    const code = this.getAuthCode(discordID);
-
-    if (code == authCode) {
-      const playerUUID = this.getUUID(discordID);
-
-      this.db.prepare(
-        `DELETE FROM ${this.tableName} WHERE discord_id=?`
-      ).run(discordID);
-
-      return playerUUID;
-    } else
-      return null;
-  }
-
-  public hasAuthCode(discordID: string): boolean {
-    return this.getAuthCode(discordID) != null;
-  }
-
-  /**
-   * Generates a new auth code for a given Discord user
-   */
-  public newAuthCode(discordID: string, playerUUID: string): string {
-    const authCode = uuid().split('-')[0];
-    const alreadyHasCode = this.hasAuthCode(discordID);
-
-    if (alreadyHasCode) {
-      throw new AlreadyAuthCode();
+        return row;
     }
 
-    this.db.prepare(
-      `INSERT INTO ${this.tableName} (discord_id,auth_code,minecraft_id) VALUES (?,?,?)`
-    ).run(discordID, authCode, playerUUID);
+    public getAuthCode(auth_code: string): PendingAuthorisationInstance | null {
+        const row: PendingAuthorisationInstance | null = this.db.prepare<[string]>(
+            `SELECT * FROM ${this.tablename} WHERE auth_code=?`,
+        ).get(auth_code);
 
-    return authCode;
-  }
+        return row;
+    }
 
-  private init() {
-    this.db.prepare(
-      `CREATE TABLE IF NOT EXISTS ${this.tableName} (` +
-      "discord_id text UNIQUE NOT NULL," +
-      "minecraft_id text NOT NULL," +
-      "auth_code text UNIQUE NOT NULL" +
-      ")"
-    ).run();
-  }
+    /**
+     * Creates an auth code for a user.
+     * If it already exists, the code will be generated as-is.
+     */
+    public assertAuthCode(mc_id: string): PendingAuthorisationInstance {
+        const alreadyExistingCode = this.getMinecraftPlayer(mc_id);
+        if (alreadyExistingCode !== null) return alreadyExistingCode;
+        const auth_code = uuid().split('-')[0];
+        this.db.prepare<[string, string]>(
+            `INSERT INTO ${this.tablename} (mc_id,auth_code) VALUES (?,?)`,
+        ).run(mc_id, auth_code);
+
+        return {
+            auth_code,
+            mc_id,
+        };
+    }
+
+    public init() {
+        this.db.prepare<[]>(
+            `CREATE TABLE IF NOT EXISTS ${this.tablename} (` + [
+                "mc_id text UNIQUE NOT NULL",
+                "auth_code text UNIQUE NOT NULL",
+            ].join(',') + ")",
+        ).run();
+    }
 }
