@@ -39,10 +39,10 @@ export class Commands {
 
     if (args.length > 1) {
       const authCode = args[2];
-      const playerUUID = this.db.auth.authorizedCode(msg.author.id, authCode);
+      const playerUUID = await this.db.auth.authorizedCode(msg.author.id, authCode);
 
       if (playerUUID) {
-        this.db.links.link(msg.author.id, playerUUID);
+        await this.db.links.link(msg.author.id, playerUUID);
         await msg.reply("Linked.");
       } else {
         await msg.reply("Invalid authentication code");
@@ -108,10 +108,10 @@ export class Commands {
 
     try {
       const playerUUID = await mc.getUUID(playerName);
-      this.db.links.checkIfLinked(msg.author.id, playerUUID);
+      await this.db.links.checkIfLinked(msg.author.id, playerUUID);
 
       if (playerUUID) {
-        this.db.auth.newAuthCode(msg.author.id, playerUUID);
+        await this.db.auth.newAuthCode(msg.author.id, playerUUID);
 
         await msg.reply(
           "Please join the Minecraft server to get your authentication " +

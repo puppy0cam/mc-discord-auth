@@ -31,7 +31,7 @@ export async function postReq(req: Request, res: Response) {
 
   try {
   	const playerUUID: string = await mc.getUUID(playerName);
-    const isAdded = webServer.db.alts.addAnAlt(
+    const isAdded = await webServer.db.alts.addAnAlt(
       owner,
       playerUUID,
       playerName

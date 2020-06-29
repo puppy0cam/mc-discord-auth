@@ -42,7 +42,7 @@ isValidPlayer.post('/isValidPlayer', async (req: Request, res: Response) => {
   }
 
   try {
-    const linkedDiscord = webserver.db.links.getDiscordID(playerUUID);
+    const linkedDiscord = await webserver.db.links.getDiscordID(playerUUID);
 
     if (linkedDiscord) {
       // let's see if they're a verified member
@@ -52,7 +52,7 @@ isValidPlayer.post('/isValidPlayer', async (req: Request, res: Response) => {
       res.end();
     } else {
       // let's see if this person has an auth code
-      const authCode = webserver.db.auth.getAuthCode(playerUUID);
+      const authCode = await webserver.db.auth.getAuthCode(playerUUID);
 
       if (authCode) {
         const body: authCodeRes = {

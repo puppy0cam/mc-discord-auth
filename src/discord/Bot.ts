@@ -181,10 +181,10 @@ export class Bot {
       return;
 
     const statusEmbed = new MessageEmbed();
-    const linked = this.db.links.getAllDiscordAccs().length;
-    const alts = this.db.alts.getAllAlts().length;
+    const linked = (await this.db.links.getAllDiscordAccs()).length;
+    const alts = (await this.db.alts.getAllAlts()).length;
     const authCodes = this.db.auth.getAllAuthCodes().length;
-    const banned = this.db.bans.getAll().length;
+    const banned = (await this.db.bans.getAll()).length;
     let adminRoles = '**Admin Roles**\n';
     let whitelist = '**Whitelist Roles**\n';
 
@@ -228,7 +228,7 @@ export class Bot {
    * This returns the "whois" of someone
    */
   public async whoIs(user: User, channel: TextChannel) {
-    const uuid = this.db.links.getMcID(user.id);
+    const uuid = await this.db.links.getMcID(user.id);
     const name = await mc.getName(uuid);
 
     await channel.send(

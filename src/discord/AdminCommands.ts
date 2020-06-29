@@ -68,7 +68,7 @@ export class AdminCommands {
       const target = msg.mentions.members.first();
 
       if (target) {
-        this.db.links.unlinkDiscordAcc(target.id);
+        await this.db.links.unlinkDiscordAcc(target.id);
         await msg.reply(
           `Unlinked ${target.user.username}'s claimed Minecraft account`);
         return;
@@ -80,7 +80,7 @@ export class AdminCommands {
     const playerName = args[2];
     try {
       const playerUUID = await mc.getUUID(playerName);
-      this.db.links.unlinkMcAcc(playerUUID);
+      await this.db.links.unlinkMcAcc(playerUUID);
       await msg.reply(`Unlinked "${playerName}"`);
     } catch (err) {
       await msg.reply("Please provide a valid Discord user or Minecraft" +
@@ -158,7 +158,7 @@ export class AdminCommands {
 
     if (target) {
       try {
-        this.db.bans.pardon(target.id);
+        await this.db.bans.pardon(target.id);
         await msg.reply(`Pardoned "${target.user.username}"`);
       } catch (err) {
         await msg.reply("This member is not banned.");

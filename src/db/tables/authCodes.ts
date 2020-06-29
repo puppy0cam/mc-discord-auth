@@ -21,7 +21,7 @@ export class AuthCodes {
   /**
    * Gets the auth code associated with a given identifier
    */
-  public getAuthCode(id: string): string | null {
+  public async getAuthCode(id: string): Promise<string | null> {
     const row = this.db.prepare(
       `SELECT auth_code FROM ${this.tableName} WHERE discord_id=? ` +
       `OR minecraft_id=?`
@@ -78,11 +78,11 @@ export class AuthCodes {
    * Checks to see if a given auth code is correct, it also deletes it from
    * the table
    */
-  public authorizedCode(discordID: string, authCode: string): string | null {
-    const code = this.getAuthCode(discordID);
+  public async authorizedCode(discordID: string, authCode: string): Promise<string | null> {
+    const code = await this.getAuthCode(discordID);
 
     if (code == authCode) {
-      const playerUUID = this.getUUID(discordID);
+      const playerUUID = await this.getUUID(discordID);
 
       this.db.prepare(
         `DELETE FROM ${this.tableName} WHERE discord_id=?`
@@ -93,16 +93,16 @@ export class AuthCodes {
       return null;
   }
 
-  public hasAuthCode(discordID: string): boolean {
-    return this.getAuthCode(discordID) != null;
+  public async hasAuthCode(discordID: string): Promise<boolean> {
+    return (await this.getAuthCode(discordID)) != null;
   }
 
   /**
    * Generates a new auth code for a given Discord user
    */
-  public newAuthCode(discordID: string, playerUUID: string): string {
+  public async newAuthCode(discordID: string, playerUUID: string): Promise<string> {
     const authCode = uuid().split('-')[0];
-    const alreadyHasCode = this.hasAuthCode(discordID);
+    const alreadyHasCode = await this.hasAuthCode(discordID);
 
     if (alreadyHasCode) {
       throw new AlreadyAuthCode();
