@@ -185,7 +185,6 @@ export class AdminCommands {
     try {
       if (member) {
         await this.bot.whoIs(member.user, msg.channel as TextChannel);
-        await msg.reply()
       } else {
         const playerName = args[2];
 
