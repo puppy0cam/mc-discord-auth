@@ -52,12 +52,17 @@ export class Commands {
    * This is the help command it prints all the available commands
    */
   public async help(msg: Message) {
+    await msg.reply(` **How To Sign-up**:
+ - Join the server, it will give you an authentication code
+ - type it here: .mc auth <code>.`)
+  }
+
+  public async commands(msg: Message) {
     const bot = this.bot;
     await msg.reply(
       "Available Commands:\n" +
-      ` - ${bot.prefix} link <Minecraft player name> To associate your` +
-      ` Discord account with your provided Minecraft account\n` +
-      ` - ${bot.prefix} unlink\n` +
+      ` - ${bot.prefix} auth <auth codes>\n` +
+      ` - ${bot.prefix} unlink Unlink your Minecraft account.\n` +
       ` - ${bot.prefix} help Display this help dialogue\n` +
       ` - ${bot.prefix} whoami For debugging purposes\n` +
       ` - ${bot.prefix} admin Display admin commands`
@@ -77,7 +82,7 @@ export class Commands {
 
     // args = ["<bot prefix>", "unlink"]
     if (args.length == 2) {
-      this.db.links.unlinkDiscordAcc(msg.author.id);
+      await this.db.links.unlinkDiscordAcc(msg.author.id);
       this.db.auth.removeAuth(msg.author.id);
       await msg.reply("Unlinked.");
     } else {

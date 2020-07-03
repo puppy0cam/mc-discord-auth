@@ -4,7 +4,7 @@
  */
 import { Bot } from "./Bot";
 import { DBController } from "../db";
-import { Message, TextChannel } from "discord.js";
+import { Client, Message, TextChannel } from "discord.js";
 import * as mc from "../minecraft";
 
 
@@ -13,10 +13,12 @@ import * as mc from "../minecraft";
  */
 export class AdminCommands {
   private readonly bot: Bot;
+  private readonly client: Client;
   private readonly db: DBController;
 
-  constructor(bot: Bot, db: DBController) {
+  constructor(bot: Bot, client: Client, db: DBController) {
     this.bot = bot;
+    this.client = client;
     this.db = db;
   }
 
@@ -37,7 +39,7 @@ export class AdminCommands {
         ` - ${bot.prefix} ban <@discord member> Ban bot usage\n` +
         ` - ${bot.prefix} pardon <@discord member>\n` +
         ` - ${bot.prefix} status Display debug info\n` +
-        ` - ${bot.prefix} whois <@discord member> Displays debug info of someone else`
+        ` - ${bot.prefix} whois <mc name || @discord member> Displays debug info of someone else`
       );
     } else {
       await msg.reply("You're not an admin.");
@@ -171,8 +173,10 @@ export class AdminCommands {
 
   /**
    * This is the whois command
+   * @param msg
+   * @param args = [".mc", "whois", "<@ID> or player name"]
    */
-  public async whois(msg: Message) {
+  public async whois(msg: Message, args: string[]) {
     if (!msg.mentions.members || !msg.member)
       return;
 
@@ -181,11 +185,28 @@ export class AdminCommands {
     try {
       if (member) {
         await this.bot.whoIs(member.user, msg.channel as TextChannel);
+        await msg.reply()
       } else {
-        await msg.reply("Please mention somebody");
+        const playerName = args[2];
+
+        if (playerName) {
+          const uuid = await mc.getUUID(playerName);
+          const discordID = await this.db.links.getDiscordID(uuid);
+
+          if (!discordID || !uuid) {
+            await msg.reply("That account isn't linked with anything.");
+            return
+          }
+          const user = await this.client.users.fetch(discordID);
+          await msg.reply(
+            `${user.username}#${user.discriminator} (<@${discordID}>)`
+          );
+        } else {
+          await msg.reply("Please mention somebody or provide a player name");
+        }
       }
     } catch (err) {
-      await msg.reply("That account isn't linked with anything.");
+
     }
   }
 }

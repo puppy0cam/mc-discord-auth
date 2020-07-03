@@ -58,7 +58,7 @@ export class Bot {
     this.adminRoles = config.admin_roles;
     this.token = config.token;
     this.commands = new Commands(this, db);
-    this.adminCommands = new AdminCommands(this, db);
+    this.adminCommands = new AdminCommands(this, this.client, db);
   }
 
   /**
@@ -334,7 +334,10 @@ export class Bot {
           await this.status(message);
           break;
         case 'whois':
-          await this.adminCommands.whois(message);
+          await this.adminCommands.whois(message, args);
+          break;
+        case 'commands':
+          await this.commands.commands(message);
           break;
         case 'help':
         default:
