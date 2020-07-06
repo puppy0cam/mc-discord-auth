@@ -36,6 +36,8 @@ export class AdminCommands {
         "Admin Commands:\n" +
         ` - ${bot.prefix} unlink <Minecraft player name or @ discord member\n` +
         ` - ${bot.prefix} maintenance Toggles "maintenance mode"\n` +
+        ` - ${bot.prefix} lock Turn on maintenance mode\n` +
+        ` - ${bot.prefix} unlock Turn off maintenance mode\n` +
         ` - ${bot.prefix} ban <@discord member> Ban bot usage\n` +
         ` - ${bot.prefix} pardon <@discord member>\n` +
         ` - ${bot.prefix} status Display debug info\n` +
@@ -93,7 +95,7 @@ export class AdminCommands {
   /**
    * This toggles maintenance mode.
    */
-  public async maintenance(msg: Message) {
+  public async maintenance(msg: Message, toggled: boolean | null) {
     if (!msg.member)
       return;
 
@@ -104,7 +106,7 @@ export class AdminCommands {
       return;
     }
 
-    const isOn = this.bot.maintenanceMode();
+    const isOn = this.bot.setMaintenance(toggled);
 
     if (isOn)
       await msg.reply("Maintenance mode is now on.");

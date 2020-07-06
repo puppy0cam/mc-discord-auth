@@ -53,7 +53,7 @@ export class Bot {
     this.guild = config.guild_id;
     this.whitelist = config.roles;
     this.db = db;
-    this.maintenance = false;
+    this.maintenance = true;
     this.prefix = config.prefix;
     this.adminRoles = config.admin_roles;
     this.token = config.token;
@@ -176,8 +176,11 @@ export class Bot {
    * This is the maintenance command, it toggles "maintenance mode".
    * Bot admin can only run this command.
    */
-  public maintenanceMode(): boolean {
-    return (this.maintenance = !this.maintenance);
+  public setMaintenance(toggled: boolean | null): boolean {
+    if (toggled == null)
+      return (this.maintenance = !this.maintenance);
+    else
+      return (this.maintenance = toggled);
   }
 
   /**
@@ -303,6 +306,12 @@ export class Bot {
 
       switch (args[1]) {
         // COMMANDS
+        case 'lock':
+          await this.adminCommands.maintenance(message, true);
+          break;
+        case 'unlock':
+          await this.adminCommands.maintenance(message, false);
+          break;
         case 'auth':
           await this.commands.auth(message, args);
           break;
@@ -328,7 +337,7 @@ export class Bot {
           await this.adminCommands.pardon(message);
           break;
         case 'maintenance':
-          await this.adminCommands.maintenance(message);
+          await this.adminCommands.maintenance(message, null);
           break;
         case 'status':
           await this.status(message);
