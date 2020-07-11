@@ -29,6 +29,7 @@ export class Commands {
   public async auth(msg: Message, args: string[]) {
     if (!msg.member)
       return;
+    const connectionAddress = this.bot.getMinecraftConnectionAddress() || "the server";
 
     if (args.length > 1) {
       const authCode = args[2];
@@ -36,14 +37,15 @@ export class Commands {
 
       if (playerUUID) {
         await this.db.links.link(msg.author.id, playerUUID);
-        await msg.reply("Linked.");
+        await msg.reply(`You are now authenticated to join ${connectionAddress} to play`);
       } else {
-        await msg.reply("Invalid authentication code");
+        await msg.reply(`Invalid authentication code\nObtain an authentication code by attempting to join ${connectionAddress} in a Minecraft Java Edition client`);
       }
 
 
     } else {
-      await msg.reply("Please provide an authentication code");
+      await msg.reply(`Please provide an authentication code
+Obtain an authentication code by attempting to join ${connectionAddress} in a Minecraft Java Edition client`);
     }
   }
 
@@ -52,8 +54,9 @@ export class Commands {
    * This is the help command it prints all the available commands
    */
   public async help(msg: Message) {
+    const connectionAddress = this.bot.getMinecraftConnectionAddress() || "the server";
     await msg.reply(` **How To Sign-up**:
- - Join the server, it will give you an authentication code
+ - Join ${connectionAddress}, it will give you an authentication code
  - type it here: .mc auth <code>.`)
   }
 

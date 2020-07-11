@@ -34,6 +34,7 @@ export type DiscordConfig = {
   roles: string[];
   admin_roles: string[];
   token: string;
+  minecraft_connection_address: string;
 }
 
 /**
@@ -71,6 +72,7 @@ export class Config {
       roles: ['role id 1', 'role id 2', 'role id 3'],
       admin_roles: ['role id 1', 'role id 2'],
       guild_id: '',
+      minecraft_connection_address: 'example.org',
     };
     this.webserver = {
       token: uuid(),

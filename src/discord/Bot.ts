@@ -32,6 +32,7 @@ const pkg = require('../../package.json');
  * @property {string} token Discord bot access token
  * @property {Commands} commands Regular commands
  * @property {AdminCommands} adminCommands Admin commands
+ * @property {string} minecraftConnectionAddress Server ip to join.
  */
 export class Bot {
   public readonly prefix: string;
@@ -46,6 +47,7 @@ export class Bot {
   private readonly commands: Commands;
   private readonly adminCommands: AdminCommands;
   private readonly version = pkg.version;
+  private readonly minecraftConnectionAddress: string;
 
 
   constructor(db: DBController, config: DiscordConfig) {
@@ -59,6 +61,7 @@ export class Bot {
     this.token = config.token;
     this.commands = new Commands(this, db);
     this.adminCommands = new AdminCommands(this, this.client, db);
+    this.minecraftConnectionAddress = config.minecraft_connection_address;
   }
 
   /**
@@ -369,5 +372,13 @@ export class Bot {
       return guild.member(id);
     else
       throw new Error("Internal error occurred while fetching guild.");
+  }
+
+  /**
+   * This gets the connection address the player is intended to use.
+   * @returns {string | null}
+   */
+  public getMinecraftConnectionAddress(): string | null {
+    return this.minecraftConnectionAddress || null;
   }
 }
